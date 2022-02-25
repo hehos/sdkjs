@@ -11769,6 +11769,9 @@ QueryTableField.prototype.clone = function() {
 	CPrintPreviewState.prototype.getPage = function (index) {
 		return this.pages && this.pages.arrPages[index];
 	};
+	CPrintPreviewState.prototype.getActivePage = function () {
+		return this.activePage != null && this.pages && this.pages.arrPages[this.activePage];
+	};
 	CPrintPreviewState.prototype.clean = function (revertZoom) {
 		//this.ctx = null;
 		this.pages = null;
@@ -11831,6 +11834,8 @@ QueryTableField.prototype.clone = function() {
 		}
 
 		kF *= (height * kF) / (height * kF + canvasTopPadding)
+
+		//kF = 1;
 
 		var isChangeForZoom;
 		var trueZoom = kF * AscCommon.AscBrowser.convertToRetinaValue(1, true);

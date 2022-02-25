@@ -4167,6 +4167,18 @@
 		width -= 3; // indent
 		top += 1 - offsetY;
 
+		var diffX = 0, diffY = 0
+		if (this.workbook.printPreviewState) {
+			var ap = this.workbook.printPreviewState.getActivePage();
+			if (ap) {
+				diffX = ap.leftFieldInPx
+				diffY = ap.topFieldInPx
+			}
+		}//printPagesData.leftFieldInPx - t.cellsLeft
+
+		//x -= diffX
+		//top -= diffY
+
 		var graphics = (ctx && ctx.DocumentRenderer) || this.handlers.trigger('getMainGraphics');
 		var cellValue = c.getNumberValue();
 		if (oDataBarRule) {
