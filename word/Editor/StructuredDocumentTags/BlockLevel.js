@@ -1582,6 +1582,18 @@ CBlockLevelSdt.prototype.RestartSpellCheck = function()
 {
 	this.Content.RestartSpellCheck();
 };
+//----------------------------------------------------------------------------------------------------------------------
+// Search
+//----------------------------------------------------------------------------------------------------------------------
+CBlockLevelSdt.prototype.Search = function(sStr, oProps, oSearchEngine, nType)
+{
+	this.Content.Search(sStr, oProps, oSearchEngine, nType);
+};
+CBlockLevelSdt.prototype.GetSearchElementId = function(bNext, bCurrent)
+{
+	return this.Content.GetSearchElementId(bNext, bCurrent);
+};
+//----------------------------------------------------------------------------------------------------------------------
 CBlockLevelSdt.prototype.ClearContentControl = function()
 {
 	var oParagraph = new Paragraph(this.LogicDocument.Get_DrawingDocument(), this.Content);

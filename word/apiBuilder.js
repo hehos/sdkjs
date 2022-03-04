@@ -6975,7 +6975,7 @@
 
 		if (!oDocument.Document.SearchEngine.Compare(sText, {MatchCase: isMatchCase}))
 		{
-			SearchEngine		= new CDocumentSearch();
+			SearchEngine		= new AscCommonWord.CDocumentSearch();
 			SearchEngine.Set(sText, {MatchCase: isMatchCase});
 			this.Paragraph.Search(sText, {MatchCase: isMatchCase}, SearchEngine, 0)
 		}

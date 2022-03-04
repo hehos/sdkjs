@@ -13854,6 +13854,215 @@ Paragraph.prototype.IgnoreMisspelledWord = function(oElement)
 	}
 };
 //----------------------------------------------------------------------------------------------------------------------
+// Search
+//----------------------------------------------------------------------------------------------------------------------
+Paragraph.prototype.Search = function(sStr, oProps, oSearchEngine, nType)
+{
+	var oParaSearch = new AscCommonWord.CParagraphSearch(this, sStr, oProps, oSearchEngine, nType);
+	for (var nPos = 0, nContentLen = this.Content.length; nPos < nContentLen; ++nPos)
+	{
+		this.Content[nPos].Search(oParaSearch);
+	}
+
+	return;
+
+	// TODO: Здесь расчитываем окружающий текст, надо перенести в отдельную функцию, которая будет вызываться
+	//       из интерфейса, когда сделают панель для поиска
+
+	var MaxShowValue = 100;
+	for ( var FoundId in this.SearchResults )
+	{
+		var StartPos = this.SearchResults[FoundId].StartPos;
+		var EndPos   = this.SearchResults[FoundId].EndPos;
+		var ResultStr;
+
+		var _Str = sStr;
+
+		// Теперь мы должны сформировать строку
+		if ( _Str.length >= MaxShowValue )
+		{
+			ResultStr = "\<b\>";
+			for ( var Index = 0; Index < MaxShowValue - 1; Index++ )
+				ResultStr += _Str[Index];
+
+			ResultStr += "\</b\>...";
+		}
+		else
+		{
+			ResultStr = "\<b\>" + _Str + "\</b\>";
+
+			var LeaveCount = MaxShowValue - _Str.length;
+			var RunElementsAfter  = new CParagraphRunElements(EndPos, LeaveCount, [para_Text, para_Space, para_Tab]);
+			var RunElementsBefore = new CParagraphRunElements(StartPos, LeaveCount, [para_Text, para_Space, para_Tab]);
+
+			this.GetNextRunElements(RunElementsAfter);
+			this.GetPrevRunElements(RunElementsBefore);
+
+			var LeaveCount_2 = LeaveCount / 2;
+
+			if ( RunElementsAfter.Elements.length >= LeaveCount_2 && RunElementsBefore.Elements.length >= LeaveCount_2 )
+			{
+				for ( var Index = 0; Index < LeaveCount_2; Index++ )
+				{
+					var ItemB = RunElementsBefore.Elements[Index];
+					var ItemA = RunElementsAfter.Elements[Index];
+
+					ResultStr = (para_Text === ItemB.Type ? ItemB.Value : " ") + ResultStr + (para_Text === ItemA.Type ? ItemA.Value : " ");
+				}
+			}
+			else if ( RunElementsAfter.Elements.length < LeaveCount_2 )
+			{
+				var TempCount = RunElementsAfter.Elements.length;
+				for ( var Index = 0; Index < TempCount; Index++ )
+				{
+					var ItemA = RunElementsAfter.Elements[Index];
+					ResultStr = ResultStr + (para_Text === ItemA.Type ? ItemA.Value : " ");
+				}
+
+				var TempCount = Math.min( 2 * LeaveCount_2 - RunElementsAfter.Elements.length, RunElementsBefore.Elements.length );
+				for ( var Index = 0; Index < TempCount; Index++ )
+				{
+					var ItemB = RunElementsBefore.Elements[Index];
+					ResultStr = (para_Text === ItemB.Type ? ItemB.Value : " ") + ResultStr;
+				}
+			}
+			else
+			{
+				var TempCount = RunElementsAfter.Elements.length;
+				for ( var Index = 0; Index < TempCount; Index++ )
+				{
+					var ItemA = RunElementsAfter.Elements[Index];
+					ResultStr = ResultStr + (para_Text === ItemA.Type ? ItemA.Value : " ");
+				}
+
+				var TempCount = RunElementsBefore.Elements.length;
+				for ( var Index = 0; Index < TempCount; Index++ )
+				{
+					var ItemB = RunElementsBefore.Elements[Index];
+					ResultStr = (para_Text === ItemB.Type ? ItemB.Value : " ") + ResultStr;
+				}
+			}
+		}
+
+		this.SearchResults[FoundId].ResultStr = ResultStr;
+	}
+};
+Paragraph.prototype.GetSearchElementId = function(bNext, bCurrent)
+{
+	// Определим позицию, начиная с которой мы будем искать ближайший найденный элемент
+	var ContentPos = null;
+
+	if ( true === bCurrent )
+	{
+		if ( true === this.Selection.Use )
+		{
+			var SSelContentPos = this.Get_ParaContentPos( true, true );
+			var ESelContentPos = this.Get_ParaContentPos( true, false );
+
+			if ( SSelContentPos.Compare( ESelContentPos ) > 0 )
+			{
+				var Temp = ESelContentPos;
+				ESelContentPos = SSelContentPos;
+				SSelContentPos = Temp;
+			}
+
+			if ( true === bNext )
+				ContentPos = ESelContentPos;
+			else
+				ContentPos = SSelContentPos;
+		}
+		else
+			ContentPos = this.Get_ParaContentPos( false, false );
+	}
+	else
+	{
+		if ( true === bNext )
+			ContentPos = this.Get_StartPos();
+		else
+			ContentPos = this.Get_EndPos( false );
+	}
+
+	// Производим поиск ближайшего элемента
+	if ( true === bNext )
+	{
+		var StartPos = ContentPos.Get(0);
+		var ContentLen = this.Content.length;
+
+		for ( var CurPos = StartPos; CurPos < ContentLen; CurPos++ )
+		{
+			var ElementId = this.Content[CurPos].GetSearchElementId( true, CurPos === StartPos, ContentPos, 1 );
+			if ( null !== ElementId )
+				return ElementId;
+		}
+	}
+	else
+	{
+		var StartPos = ContentPos.Get(0);
+		var ContentLen = this.Content.length;
+
+		for ( var CurPos = StartPos; CurPos >= 0; CurPos-- )
+		{
+			var ElementId = this.Content[CurPos].GetSearchElementId( false, CurPos === StartPos, ContentPos, 1 );
+			if ( null !== ElementId )
+				return ElementId;
+		}
+	}
+
+	return null;
+};
+Paragraph.prototype.AddSearchResult = function(nId, oStartPos, oEndPos, nType)
+{
+	if (!oStartPos || !oEndPos)
+		return;
+
+	var oSearchResult = new AscCommonWord.CParagraphSearchElement(oStartPos, oEndPos, nType, nId);
+	this.SearchResults[nId] = oSearchResult;
+	oSearchResult.RegisterClass(true, this);
+	oSearchResult.RegisterClass(false, this);
+
+	this.Content[oStartPos.Get(0)].AddSearchResult(oSearchResult, true, oStartPos, 1);
+	this.Content[oEndPos.Get(0)].AddSearchResult(oSearchResult, false, oEndPos, 1);
+};
+Paragraph.prototype.ClearSearchResults = function()
+{
+	for (var Id in this.SearchResults)
+	{
+		var SearchResult = this.SearchResults[Id];
+
+		for (var Pos = 1, ClassesCount = SearchResult.ClassesS.length; Pos < ClassesCount; Pos++)
+		{
+			SearchResult.ClassesS[Pos].ClearSearchResults();
+		}
+
+		for (var Pos = 1, ClassesCount = SearchResult.ClassesE.length; Pos < ClassesCount; Pos++)
+		{
+			SearchResult.ClassesE[Pos].ClearSearchResults();
+		}
+	}
+
+	this.SearchResults = {};
+};
+Paragraph.prototype.RemoveSearchResult = function(Id)
+{
+	var oSearchResult = this.SearchResults[Id];
+	if (oSearchResult)
+	{
+		var ClassesCount = oSearchResult.ClassesS.length;
+		for (var Pos = 1; Pos < ClassesCount; Pos++)
+		{
+			oSearchResult.ClassesS[Pos].RemoveSearchResult(oSearchResult);
+		}
+
+		var ClassesCount = oSearchResult.ClassesE.length;
+		for (var Pos = 1; Pos < ClassesCount; Pos++)
+		{
+			oSearchResult.ClassesE[Pos].RemoveSearchResult(oSearchResult);
+		}
+
+		delete this.SearchResults[Id];
+	}
+};
+//----------------------------------------------------------------------------------------------------------------------
 Paragraph.prototype.Get_SectionPr = function()
 {
 	return this.SectPr;
