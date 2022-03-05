@@ -2509,7 +2509,7 @@ function CDocument(DrawingDocument, isMainLogicDocument)
     // Класс для работы с поиском и заменой в документе
     this.SearchEngine = null;
     if (typeof AscCommonWord.CDocumentSearch !== "undefined")
-        this.SearchEngine = new AscCommonWord.CDocumentSearch();
+        this.SearchEngine = new AscCommonWord.CDocumentSearch(this);
 
     // Параграфы, в которых есть ошибки в орфографии (объект с ключом - Id параграфа)
     this.Spelling = new AscCommonWord.CDocumentSpellChecker();
@@ -10043,7 +10043,7 @@ CDocument.prototype.OnKeyDown = function(e)
 
     // Сбрасываем текущий элемент в поиске
     if (this.SearchEngine.Count > 0)
-        this.SearchEngine.Reset_Current();
+        this.SearchEngine.ResetCurrent();
 
     var bUpdateSelection = true;
     var bRetValue        = keydownresult_PreventNothing;
@@ -11350,7 +11350,7 @@ CDocument.prototype.OnMouseDown = function(e, X, Y, PageIndex)
 
 	// Сбрасываем текущий элемент в поиске
 	if (this.SearchEngine.Count > 0)
-		this.SearchEngine.Reset_Current();
+		this.SearchEngine.ResetCurrent();
 
 	this.CurPos.CC = null;
 

@@ -2795,7 +2795,7 @@ function CPresentation(DrawingDocument) {
 
     this.DrawingDocument = DrawingDocument;
 
-    this.SearchEngine = new AscCommonWord.CDocumentSearch();
+    this.SearchEngine = new AscCommonWord.CDocumentSearch(this);
 
     this.NeedUpdateTarget = false;
 
@@ -6167,7 +6167,7 @@ CPresentation.prototype.OnKeyDown = function (e) {
     }
     // Сбрасываем текущий элемент в поиске
     if (this.SearchEngine.Count > 0)
-        this.SearchEngine.Reset_Current();
+        this.SearchEngine.ResetCurrent();
 
 
     var oController = this.GetCurrentController();
@@ -7027,7 +7027,7 @@ CPresentation.prototype.OnMouseDown = function (e, X, Y, PageIndex) {
 
     // Сбрасываем текущий элемент в поиске
     if (this.SearchEngine.Count > 0)
-        this.SearchEngine.Reset_Current();
+        this.SearchEngine.ResetCurrent();
 
     this.CurPage = PageIndex;
     e.ctrlKey = e.CtrlKey;
@@ -7272,7 +7272,7 @@ CPresentation.prototype.IsFocusOnNotes = function () {
 CPresentation.prototype.Notes_OnMouseDown = function (e, X, Y) {
     // Сбрасываем текущий элемент в поиске
     if (this.SearchEngine.Count > 0)
-        this.SearchEngine.Reset_Current();
+        this.SearchEngine.ResetCurrent();
     var bFocusOnSlide = !this.FocusOnNotes;
     this.FocusOnNotes = true;
     var oCurSlide = this.Slides[this.CurPage];
