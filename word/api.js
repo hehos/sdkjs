@@ -3159,7 +3159,6 @@ background-repeat: no-repeat;\
 			this.WordControl.OnUpdateOverlay();
 		}
 	};
-
 	asc_docs_api.prototype.asc_findText = function(text, isNext, isMatchCase, callback)
 	{
 		var result = 0;
@@ -3185,7 +3184,6 @@ background-repeat: no-repeat;\
 			callback(result);
 		return result;
 	};
-
 	asc_docs_api.prototype.asc_replaceText = function(text, replaceWith, isReplaceAll, isMatchCase)
 	{
 		if (this.asc_GetErrorForReplaceString(replaceWith))
@@ -3216,10 +3214,9 @@ background-repeat: no-repeat;\
 			return false;
 		}
 	};
-
 	asc_docs_api.prototype.asc_GetErrorForReplaceString = function(sString)
 	{
-		return (new CSearchPatternEngine()).GetErrorForReplaceString(sString);
+		return (new AscCommonWord.CSearchPatternEngine()).GetErrorForReplaceString(sString);
 	};
 
 	asc_docs_api.prototype._selectSearchingResults = function(bShow)
@@ -3238,7 +3235,6 @@ background-repeat: no-repeat;\
 		}
 		this.WordControl.m_oLogicDocument.HighlightSearchResults(bShow);
 	};
-
 	asc_docs_api.prototype.asc_isSelectSearchingResults = function()
 	{
 		if (null != this.WordControl.m_oDrawingDocument.m_oDocumentRenderer)
@@ -3247,15 +3243,17 @@ background-repeat: no-repeat;\
 		}
 		return this.WordControl.m_oLogicDocument.IsHighlightSearchResults();
 	};
-
 	asc_docs_api.prototype.sync_ReplaceAllCallback = function(ReplaceCount, OverallCount)
 	{
 		this.sendEvent("asc_onReplaceAll", OverallCount, ReplaceCount);
 	};
-
 	asc_docs_api.prototype.sync_SearchEndCallback = function()
 	{
 		this.sendEvent("asc_onSearchEnd");
+	};
+	asc_docs_api.prototype.sync_setSearchCurrent = function(nCurrent, nOverallCount)
+	{
+		this.sendEvent("asc_onSetSearchCurrent", nCurrent, nOverallCount);
 	};
 	/*----------------------------------------------------------------*/
 	/*functions for working with font*/

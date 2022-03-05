@@ -3552,6 +3552,10 @@
 	baseEditorsApi.prototype.asc_drawPrintPreview                     = function()
 	{
 	};
+	//---------------------------------------------------------search-----------------------------------------------------
+	baseEditorsApi.prototype.sync_setSearchCurrent = function(nCurrent, nOverallCount)
+	{
+	};
 	//---------------------------------------------------------version----------------------------------------------------
 	baseEditorsApi.prototype["GetVersion"] = baseEditorsApi.prototype.GetVersion = function()
 	{

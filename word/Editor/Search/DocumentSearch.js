@@ -38,8 +38,9 @@
 	 * Механизм поиска. Хранит параграфы с найденной строкой
 	 * @constructor
 	 */
-	function CDocumentSearch()
+	function CDocumentSearch(oLogicDocument)
 	{
+		this.LogicDocument = oLogicDocument;
 		this.Text          = "";
 		this.MatchCase     = false;
 		this.Word	   	   = false;
@@ -90,16 +91,15 @@
 	CDocumentSearch.prototype.Add = function(Paragraph)
 	{
 		this.Count++;
-		this.Id++;
-		this.Elements[this.Id] = Paragraph;
-		return this.Id;
+		this.Elements[this.Id++] = Paragraph;
+		return (this.Id - 1);
 	};
-	CDocumentSearch.prototype.Select = function(Id, bUpdateStates)
+	CDocumentSearch.prototype.Select = function(nId, bUpdateStates)
 	{
-		var Paragraph = this.Elements[Id];
+		var Paragraph = this.Elements[nId];
 		if (Paragraph)
 		{
-			var SearchElement = Paragraph.SearchResults[Id];
+			var SearchElement = Paragraph.SearchResults[nId];
 			if (SearchElement)
 			{
 				Paragraph.Selection.Use   = true;
@@ -111,12 +111,26 @@
 				Paragraph.Document_SetThisElementCurrent(false !== bUpdateStates);
 			}
 
-			this.CurId = Id;
+			this.SetCurrent(nId);
 		}
 	};
-	CDocumentSearch.prototype.Reset_Current = function()
+	CDocumentSearch.prototype.SetCurrent = function(nId)
 	{
-		this.CurId = -1;
+		this.CurId = undefined !== nId ? nId : -1;
+		let oApi = this.LogicDocument.GetApi()
+		oApi.sync_setSearchCurrent(this.CurId, this.Count);
+	};
+	CDocumentSearch.prototype.ResetCurrent = function()
+	{
+		this.SetCurrent(-1);
+	};
+	CDocumentSearch.prototype.GetCount = function()
+	{
+		return this.Count;
+	};
+	CDocumentSearch.prototype.GetCurrent = function()
+	{
+		return this.CurId;
 	};
 	CDocumentSearch.prototype.Replace = function(sReplaceString, Id, bRestorePos)
 	{
