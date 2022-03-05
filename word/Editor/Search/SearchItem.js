@@ -191,22 +191,22 @@
 	 * @constructor
 	 * @extends CSearchTextItemBase
 	 */
-	function CSearchTextSpecialNewLine()
+	function CSearchTextSpecialLineBreak()
 	{
 	}
-	CSearchTextSpecialNewLine.prototype = Object.create(CSearchTextItemBase.prototype);
-	CSearchTextSpecialNewLine.prototype.IsMatch = function(oItem)
+	CSearchTextSpecialLineBreak.prototype = Object.create(CSearchTextItemBase.prototype);
+	CSearchTextSpecialLineBreak.prototype.IsMatch = function(oItem)
 	{
 		return oItem.IsNewLine();
 	};
-	CSearchTextSpecialNewLine.prototype.ToRunElement = function(isMathRun)
+	CSearchTextSpecialLineBreak.prototype.ToRunElement = function(isMathRun)
 	{
 		if (isMathRun)
 			return null;
 
 		return new ParaNewLine(break_Line);
 	};
-	CSearchTextSpecialNewLine.prototype.IsNewLine = function()
+	CSearchTextSpecialLineBreak.prototype.IsNewLine = function()
 	{
 		return true;
 	};
@@ -413,22 +413,22 @@
 	 * @constructor
 	 * @extends CSearchTextItemBase
 	 */
-	function CSearchTextSpecialBreakPage()
+	function CSearchTextSpecialPageBreak()
 	{
 	}
-	CSearchTextSpecialBreakPage.prototype = Object.create(CSearchTextItemBase.prototype);
-	CSearchTextSpecialBreakPage.prototype.IsMatch = function(oItem)
+	CSearchTextSpecialPageBreak.prototype = Object.create(CSearchTextItemBase.prototype);
+	CSearchTextSpecialPageBreak.prototype.IsMatch = function(oItem)
 	{
 		return oItem.IsPageBreak();
 	};
-	CSearchTextSpecialBreakPage.prototype.ToRunElement = function(isMathRun)
+	CSearchTextSpecialPageBreak.prototype.ToRunElement = function(isMathRun)
 	{
 		if (isMathRun)
 			return null;
 
 		return new ParaNewLine(break_Page);
 	};
-	CSearchTextSpecialBreakPage.prototype.IsPageBreak = function()
+	CSearchTextSpecialPageBreak.prototype.IsPageBreak = function()
 	{
 		return true;
 	};
@@ -641,7 +641,7 @@
 	//--------------------------------------------------------export----------------------------------------------------
 	window['AscCommonWord'] = window['AscCommonWord'] || {};
 	window['AscCommonWord'].CSearchTextItemChar                  = CSearchTextItemChar;
-	window['AscCommonWord'].CSearchTextSpecialNewLine            = CSearchTextSpecialNewLine;
+	window['AscCommonWord'].CSearchTextSpecialLineBreak          = CSearchTextSpecialLineBreak;
 	window['AscCommonWord'].CSearchTextSpecialTab                = CSearchTextSpecialTab;
 	window['AscCommonWord'].CSearchTextSpecialParaEnd            = CSearchTextSpecialParaEnd;
 	window['AscCommonWord'].CSearchTextSpecialAnySymbol          = CSearchTextSpecialAnySymbol;
@@ -652,7 +652,7 @@
 	window['AscCommonWord'].CSearchTextSpecialField              = CSearchTextSpecialField;
 	window['AscCommonWord'].CSearchTextSpecialFootnoteMark       = CSearchTextSpecialFootnoteMark;
 	window['AscCommonWord'].CSearchTextSpecialGraphicObject      = CSearchTextSpecialGraphicObject;
-	window['AscCommonWord'].CSearchTextSpecialBreakPage          = CSearchTextSpecialBreakPage;
+	window['AscCommonWord'].CSearchTextSpecialPageBreak          = CSearchTextSpecialPageBreak;
 	window['AscCommonWord'].CSearchTextSpecialNonBreakingHyphen  = CSearchTextSpecialNonBreakingHyphen;
 	window['AscCommonWord'].CSearchTextSpecialNonBreakingSpace   = CSearchTextSpecialNonBreakingSpace;
 	window['AscCommonWord'].CSearchTextSpecialAnySpace           = CSearchTextSpecialAnySpace;

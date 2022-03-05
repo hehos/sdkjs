@@ -3230,7 +3230,7 @@ ParaDrawing.prototype.IsComparable = function(oDrawing)
 };
 ParaDrawing.prototype.ToSearchElement = function(oProps)
 {
-	return new CSearchTextSpecialGraphicObject();
+	return new AscCommonWord.CSearchTextSpecialGraphicObject();
 };
 ParaDrawing.prototype.IsDrawing = function()
 {
