@@ -80,7 +80,7 @@
 	{
 		switch(nCharCode)
 		{
-			case 0x006C: return new AscCommonWord.CSearchTextSpecialNewLine();	        // ^l - new line
+			case 0x006C: return new AscCommonWord.CSearchTextSpecialLineBreak();	      // ^l - new line
 			case 0x0074: return new AscCommonWord.CSearchTextSpecialTab();                // ^t - tab
 			case 0x0070: return new AscCommonWord.CSearchTextSpecialParaEnd();            // ^p - paraEnd
 			case 0x003F: return new AscCommonWord.CSearchTextSpecialAnySymbol();          // ^? - any symbol
@@ -91,7 +91,7 @@
 			case 0x0064: return new AscCommonWord.CSearchTextSpecialField();              // ^d - field
 			case 0x0066: return new AscCommonWord.CSearchTextSpecialFootnoteMark();       // ^f - footnote mark
 			case 0x0067: return new AscCommonWord.CSearchTextSpecialGraphicObject();      // ^g - graphic object
-			case 0x006D: return new AscCommonWord.CSearchTextSpecialBreakPage();          // ^m - break page
+			case 0x006D: return new AscCommonWord.CSearchTextSpecialPageBreak();          // ^m - break page
 			case 0x007E: return new AscCommonWord.CSearchTextSpecialNonBreakingHyphen();  // ^~ - nonbreaking hyphen
 			case 0x0073: return new AscCommonWord.CSearchTextSpecialNonBreakingSpace();   // ^s - nonbreaking space
 			case 0x005E: return new AscCommonWord.CSearchTextItemChar(0x5E);              // ^^ - caret character

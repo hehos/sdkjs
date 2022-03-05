@@ -195,7 +195,7 @@
 			"word/Editor/Search/DocumentSearch.js",
 			"word/Editor/Search/ParagraphSearch.js",
 			"word/Editor/Search/SearchItem.js",
-			"word/Editor/Search/SearchPattern.js",
+			"word/Editor/Search/Pattern.js",
 			"word/Editor/SpellChecker/DocumentSpellChecker.js",
 			"word/Editor/SpellChecker/ParagraphCollector.js",
 			"word/Editor/SpellChecker/ParagraphSpellChecker.js",

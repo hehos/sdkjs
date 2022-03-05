@@ -752,9 +752,9 @@ ParaText.prototype.IsDigit = function()
 ParaText.prototype.ToSearchElement = function(oProps)
 {
 	if (!oProps.MatchCase)
-		return new CSearchTextItemChar(String.fromCodePoint(this.Value).toLowerCase().codePointAt(0));
+		return new AscCommonWord.CSearchTextItemChar(String.fromCodePoint(this.Value).toLowerCase().codePointAt(0));
 
-	return new CSearchTextItemChar(this.Value);
+	return new AscCommonWord.CSearchTextItemChar(this.Value);
 };
 ParaText.prototype.IsText = function()
 {
@@ -921,7 +921,7 @@ ParaSpace.prototype.SetGapBackground = ParaText.prototype.SetGapBackground;
 ParaSpace.prototype.private_DrawGapsBackground = ParaText.prototype.private_DrawGapsBackground;
 ParaSpace.prototype.ToSearchElement = function(oProps)
 {
-	return new CSearchTextItemChar(0x20);
+	return new AscCommonWord.CSearchTextItemChar(0x20);
 };
 
 /**
@@ -1219,7 +1219,7 @@ ParaEnd.prototype.GetAutoCorrectFlags = function()
 };
 ParaEnd.prototype.ToSearchElement = function(oProps)
 {
-	return new CSearchTextSpecialParaEnd();
+	return new AscCommonWord.CSearchTextSpecialParaEnd();
 };
 ParaEnd.prototype.IsParaEnd = function()
 {
@@ -1526,11 +1526,11 @@ ParaNewLine.prototype.GetAutoCorrectFlags = function()
 ParaNewLine.prototype.ToSearchElement = function(oProps)
 {
 	if (break_Page === this.BreakType)
-		return new CSearchTextSpecialBreakPage();
+		return new AscCommonWord.CSearchTextSpecialPageBreak();
 	else if (break_Column === this.BreakType)
-		return new CSearchTextSpecialColumnBreak();
+		return new AscCommonWord.CSearchTextSpecialColumnBreak();
 	else
-		return new CSearchTextSpecialNewLine();
+		return new AscCommonWord.CSearchTextSpecialLineBreak();
 };
 ParaNewLine.prototype.IsBreak = function()
 {
@@ -1849,7 +1849,7 @@ ParaTab.prototype.GetAutoCorrectFlags = function()
 };
 ParaTab.prototype.ToSearchElement = function(oProps)
 {
-	return new CSearchTextSpecialTab();
+	return new AscCommonWord.CSearchTextSpecialTab();
 };
 ParaTab.prototype.IsTab = function()
 {
@@ -2348,7 +2348,7 @@ ParaFootnoteReference.prototype.GetRun = function()
 };
 ParaFootnoteReference.prototype.ToSearchElement = function(oProps)
 {
-	return new CSearchTextSpecialFootnoteMark();
+	return new AscCommonWord.CSearchTextSpecialFootnoteMark();
 };
 ParaFootnoteReference.prototype.PreDelete = function()
 {
@@ -2768,7 +2768,7 @@ ParaEndnoteReference.prototype.UpdateNumber = function(PRS, isKeepNumber)
 };
 ParaEndnoteReference.prototype.ToSearchElement = function(oProps)
 {
-	return new CSearchTextSpecialEndnoteMark();
+	return new AscCommonWord.CSearchTextSpecialEndnoteMark();
 };
 
 
