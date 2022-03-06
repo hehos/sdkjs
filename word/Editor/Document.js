@@ -27090,9 +27090,8 @@ CDocument.prototype.TurnOnSpellCheck = function()
 //----------------------------------------------------------------------------------------------------------------------
 CDocument.prototype.Search = function(sStr, oProps, bDraw)
 {
-	//var StartTime = new Date().getTime();
+	//let nStartTime = performance.now();
 
-	oProps.Word = false;
 	if (this.SearchEngine.Compare(sStr, oProps))
 		return this.SearchEngine;
 
@@ -27123,7 +27122,7 @@ CDocument.prototype.Search = function(sStr, oProps, bDraw)
 	if (false !== bDraw)
 		this.Redraw(-1, -1);
 
-	//console.log("Search logic: " + ((new Date().getTime() - StartTime) / 1000) + " s");
+	//console.log("Search logic: " + ((performance.now() - nStartTime) / 1000) + " s");
 
 	return this.SearchEngine;
 };

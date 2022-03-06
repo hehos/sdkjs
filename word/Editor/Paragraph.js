@@ -13893,89 +13893,6 @@ Paragraph.prototype.Search = function(sStr, oProps, oSearchEngine, nType)
 	{
 		this.Content[nPos].Search(oParaSearch);
 	}
-
-	return;
-
-	// TODO: Здесь расчитываем окружающий текст, надо перенести в отдельную функцию, которая будет вызываться
-	//       из интерфейса, когда сделают панель для поиска
-
-	var MaxShowValue = 100;
-	for ( var FoundId in this.SearchResults )
-	{
-		var StartPos = this.SearchResults[FoundId].StartPos;
-		var EndPos   = this.SearchResults[FoundId].EndPos;
-		var ResultStr;
-
-		var _Str = sStr;
-
-		// Теперь мы должны сформировать строку
-		if ( _Str.length >= MaxShowValue )
-		{
-			ResultStr = "\<b\>";
-			for ( var Index = 0; Index < MaxShowValue - 1; Index++ )
-				ResultStr += _Str[Index];
-
-			ResultStr += "\</b\>...";
-		}
-		else
-		{
-			ResultStr = "\<b\>" + _Str + "\</b\>";
-
-			var LeaveCount = MaxShowValue - _Str.length;
-			var RunElementsAfter  = new CParagraphRunElements(EndPos, LeaveCount, [para_Text, para_Space, para_Tab]);
-			var RunElementsBefore = new CParagraphRunElements(StartPos, LeaveCount, [para_Text, para_Space, para_Tab]);
-
-			this.GetNextRunElements(RunElementsAfter);
-			this.GetPrevRunElements(RunElementsBefore);
-
-			var LeaveCount_2 = LeaveCount / 2;
-
-			if ( RunElementsAfter.Elements.length >= LeaveCount_2 && RunElementsBefore.Elements.length >= LeaveCount_2 )
-			{
-				for ( var Index = 0; Index < LeaveCount_2; Index++ )
-				{
-					var ItemB = RunElementsBefore.Elements[Index];
-					var ItemA = RunElementsAfter.Elements[Index];
-
-					ResultStr = (para_Text === ItemB.Type ? ItemB.Value : " ") + ResultStr + (para_Text === ItemA.Type ? ItemA.Value : " ");
-				}
-			}
-			else if ( RunElementsAfter.Elements.length < LeaveCount_2 )
-			{
-				var TempCount = RunElementsAfter.Elements.length;
-				for ( var Index = 0; Index < TempCount; Index++ )
-				{
-					var ItemA = RunElementsAfter.Elements[Index];
-					ResultStr = ResultStr + (para_Text === ItemA.Type ? ItemA.Value : " ");
-				}
-
-				var TempCount = Math.min( 2 * LeaveCount_2 - RunElementsAfter.Elements.length, RunElementsBefore.Elements.length );
-				for ( var Index = 0; Index < TempCount; Index++ )
-				{
-					var ItemB = RunElementsBefore.Elements[Index];
-					ResultStr = (para_Text === ItemB.Type ? ItemB.Value : " ") + ResultStr;
-				}
-			}
-			else
-			{
-				var TempCount = RunElementsAfter.Elements.length;
-				for ( var Index = 0; Index < TempCount; Index++ )
-				{
-					var ItemA = RunElementsAfter.Elements[Index];
-					ResultStr = ResultStr + (para_Text === ItemA.Type ? ItemA.Value : " ");
-				}
-
-				var TempCount = RunElementsBefore.Elements.length;
-				for ( var Index = 0; Index < TempCount; Index++ )
-				{
-					var ItemB = RunElementsBefore.Elements[Index];
-					ResultStr = (para_Text === ItemB.Type ? ItemB.Value : " ") + ResultStr;
-				}
-			}
-		}
-
-		this.SearchResults[FoundId].ResultStr = ResultStr;
-	}
 };
 Paragraph.prototype.GetSearchElementId = function(bNext, bCurrent)
 {
@@ -14091,6 +14008,80 @@ Paragraph.prototype.RemoveSearchResult = function(Id)
 
 		delete this.SearchResults[Id];
 	}
+};
+Paragraph.prototype.GetTextAroundSearchResult = function(nId)
+{
+	if (!this.SearchResults[nId])
+		return null;
+
+	const nMaxLen = 100;
+
+	let oStartPos = this.SearchResults[nId].StartPos;
+	let oEndPos   = this.SearchResults[nId].EndPos;
+
+	let oState = this.SaveSelectionState();
+
+	this.Selection.Use   = true;
+	this.Selection.Start = false;
+	this.SetSelectionContentPos(oStartPos, oEndPos);
+	let sTargetText = this.GetSelectedText(false, {Numbering : false});
+
+	this.LoadSelectionState(oState);
+
+	let sResult;
+	if (sTargetText.length >= nMaxLen)
+	{
+		sResult = "\<b\>";
+		sResult += sTargetText.substr(0, nMaxLen - 1);
+		sResult += "\</b\>...";
+	}
+	else
+	{
+		let nExtraCount = nMaxLen - sTargetText.length;
+		let oRunElementsAfter  = new CParagraphRunElements(oEndPos, nExtraCount, [para_Text, para_Space, para_Tab]);
+		let oRunElementsBefore = new CParagraphRunElements(oStartPos, nExtraCount, [para_Text, para_Space, para_Tab]);
+
+		this.GetNextRunElements(oRunElementsAfter);
+		this.GetPrevRunElements(oRunElementsBefore);
+
+		var nExtraCount_2 = (nExtraCount / 2) | 0;
+
+		let arrAfter  = oRunElementsAfter.GetElements();
+		let arrBefore = oRunElementsBefore.GetElements();
+
+		let nBeforeCount = arrBefore.length;
+		let nAfterCount  = arrAfter.length;
+		if (nBeforeCount >= nExtraCount_2 && nAfterCount >= nExtraCount_2)
+		{
+			nBeforeCount = nExtraCount_2;
+			nAfterCount  = nExtraCount_2;
+		}
+		else if (nBeforeCount < nExtraCount_2)
+		{
+			nAfterCount = Math.min(arrAfter.length, nExtraCount - arrBefore.length);
+		}
+		else if (nAfterCount < nExtraCount_2)
+		{
+			nBeforeCount = Math.min(arrBefore.length, nExtraCount - arrAfter.length);
+		}
+
+		sResult = "";
+		for (let nPos = nBeforeCount - 1;  nPos >= 0; --nPos)
+		{
+			let oItem = arrBefore[nPos];
+			sResult += para_Text === oItem.Type ? String.fromCodePoint(oItem.Value) : " ";
+		}
+
+		sResult += "\<b\>" + sTargetText + "\</b\>";
+
+		for (let nPos = 0; nPos < nAfterCount; ++nPos)
+		{
+			let oItem = arrAfter[nPos];
+			sResult += para_Text === oItem.Type ? String.fromCodePoint(oItem.Value) : " ";
+		}
+	}
+
+	return sResult;
 };
 //----------------------------------------------------------------------------------------------------------------------
 Paragraph.prototype.Get_SectionPr = function()

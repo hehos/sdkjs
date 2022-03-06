@@ -3255,6 +3255,18 @@ background-repeat: no-repeat;\
 	{
 		this.sendEvent("asc_onSetSearchCurrent", nCurrent, nOverallCount);
 	};
+	asc_docs_api.prototype.sync_startTextAroundSearch = function()
+	{
+		this.sendEvent("asc_onStartTextAroundSearch");
+	};
+	asc_docs_api.prototype.sync_endTextAroundSearch = function()
+	{
+		this.sendEvent("asc_onEndTextAroundSearch");
+	};
+	asc_docs_api.prototype.sync_getTextAroundSearchPack = function(arrElements)
+	{
+		this.sendEvent("asc_onGetTextAroundSearchPack", arrElements);
+	};
 	/*----------------------------------------------------------------*/
 	/*functions for working with font*/
 	/*setters*/
