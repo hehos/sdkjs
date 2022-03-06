@@ -58,6 +58,9 @@
 		this.Footnotes     = [];
 		this.Endnotes      = [];
 		this.InsertPattern = new AscCommonWord.CSearchPatternEngine();
+
+		this.TextAroundId    = -1;
+		this.TextAroundTimer = null;
 	}
 
 	CDocumentSearch.prototype.Reset = function()
@@ -87,6 +90,8 @@
 		this.Elements  = {};
 		this.CurId     = -1;
 		this.Direction = true;
+
+		this.StopTextAround();
 	};
 	CDocumentSearch.prototype.Add = function(Paragraph)
 	{
@@ -306,6 +311,67 @@
 	CDocumentSearch.prototype.GetPrefix = function(nIndex)
 	{
 		return this.Prefix[nIndex];
+	};
+	CDocumentSearch.prototype.StartTextAround = function()
+	{
+		this.StopTextAround();
+
+		this.TextAroundId = 0;
+
+		this.LogicDocument.GetApi().sync_startTextAroundSearch();
+
+		let oThis = this;
+		this.TextAroundTimer = setTimeout(function()
+		{
+			oThis.ContinueGetTextAround()
+		}, 20);
+
+		this.TextArround = [];
+	};
+	CDocumentSearch.prototype.ContinueGetTextAround = function()
+	{
+		let arrResult = [];
+
+		let nStartTime = performance.now();
+		while (performance.now() - nStartTime < 20)
+		{
+			if (this.TextAroundId >= this.Count)
+				break;
+
+			let sId = this.TextAroundId++;
+
+			let sText = this.Elements[sId].GetTextAroundSearchResult(sId);
+			this.TextArround[sId] = sText;
+			arrResult.push([sId, sText]);
+		}
+
+		this.LogicDocument.GetApi().sync_getTextAroundSearchPack(arrResult);
+
+		let oThis = this;
+		if (this.TextAroundId >= 0 && this.TextAroundId < this.Count)
+		{
+			this.TextAroundTimer = setTimeout(function()
+			{
+				oThis.ContinueGetTextAround();
+			}, 20);
+		}
+		else
+		{
+			this.TextAroundId    = -1;
+			this.TextAroundTimer = null;
+			this.LogicDocument.GetApi().sync_endTextAroundSearch();
+		}
+	};
+	CDocumentSearch.prototype.StopTextAround = function()
+	{
+		if (this.TextAroundTimer)
+		{
+			clearTimeout(this.TextAroundTimer);
+			this.LogicDocument.GetApi().sync_endTextAroundSearch();
+		}
+
+		this.TextAroundTimer = null;
+		this.TextAroundId    = -1;
 	};
 
 	//--------------------------------------------------------export----------------------------------------------------

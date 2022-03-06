@@ -186,7 +186,6 @@
 	{
 		return true;
 	};
-
 	/**
 	 * @constructor
 	 * @extends CSearchTextItemBase
