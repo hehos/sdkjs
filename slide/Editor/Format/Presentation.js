@@ -4642,15 +4642,16 @@ CPresentation.prototype.AddNewParagraph = function (bRecalculate) {
     this.Document_UpdateInterfaceState();
 };
 
-CPresentation.prototype.Search = function (Str, Props) {
-    if (true === this.SearchEngine.Compare(Str, Props))
+CPresentation.prototype.Search = function (oProps) {
+    if (true === this.SearchEngine.Compare(oProps))
         return this.SearchEngine;
     this.SearchEngine.Clear();
-    this.SearchEngine.Set(Str, Props);
+    this.SearchEngine.Set(oProps);
 
     for (var i = 0; i < this.Slides.length; ++i) {
-        this.Slides[i].Search(Str, Props, this.SearchEngine, search_Common);
+        this.Slides[i].Search(this.SearchEngine, search_Common);
     }
+
     this.DrawingDocument.ClearCachePages();
     this.DrawingDocument.FirePaint();
     this.SearchEngine.ClearOnRecalc = true;

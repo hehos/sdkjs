@@ -1444,9 +1444,9 @@ CHeaderFooter.prototype.RestartSpellCheck = function()
 //----------------------------------------------------------------------------------------------------------------------
 // CHeaderFooter
 //----------------------------------------------------------------------------------------------------------------------
-CHeaderFooter.prototype.Search = function(sStr, oProps, oSearchEngine, nType)
+CHeaderFooter.prototype.Search = function(oSearchEngine, nType)
 {
-	this.Content.Search(sStr, oProps, oSearchEngine, nType);
+	this.Content.Search(oSearchEngine, nType);
 };
 CHeaderFooter.prototype.GetSearchElementId = function(bNext, bCurrent)
 {

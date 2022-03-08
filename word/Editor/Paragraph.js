@@ -13856,9 +13856,9 @@ Paragraph.prototype.IgnoreMisspelledWord = function(oElement)
 //----------------------------------------------------------------------------------------------------------------------
 // Search
 //----------------------------------------------------------------------------------------------------------------------
-Paragraph.prototype.Search = function(sStr, oProps, oSearchEngine, nType)
+Paragraph.prototype.Search = function(oSearchEngine, nType)
 {
-	var oParaSearch = new AscCommonWord.CParagraphSearch(this, sStr, oProps, oSearchEngine, nType);
+	var oParaSearch = new AscCommonWord.CParagraphSearch(this, oSearchEngine, nType);
 	for (var nPos = 0, nContentLen = this.Content.length; nPos < nContentLen; ++nPos)
 	{
 		this.Content[nPos].Search(oParaSearch);

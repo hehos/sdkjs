@@ -14115,20 +14115,19 @@ ParaRun.prototype.Search = function(ParaSearch)
 	this.SearchMarks = [];
 
 	var Para         = ParaSearch.Paragraph;
-	var Str          = ParaSearch.Str;
-	var Props        = ParaSearch.Props;
 	var SearchEngine = ParaSearch.SearchEngine;
 	var Type         = ParaSearch.Type;
+	let isWholeWords = SearchEngine.IsWholeWords();
 
 	for (var nPos = 0, nContentLen = this.Content.length; nPos < nContentLen; ++nPos)
 	{
 		var oItem = this.Content[nPos];
 		if (para_Drawing === oItem.Type)
-			oItem.Search(Str, Props, SearchEngine, Type);
+			oItem.Search(SearchEngine, Type);
 
 		while (ParaSearch.SearchIndex > 0 && !ParaSearch.Check(ParaSearch.SearchIndex, oItem))
 		{
-			if (Props.Word)
+			if (isWholeWords)
 			{
 				ParaSearch.SearchIndex = 0;
 			}
@@ -14153,7 +14152,7 @@ ParaRun.prototype.Search = function(ParaSearch)
 		{
 			if (0 === ParaSearch.SearchIndex)
 			{
-				if (Props.Word)
+				if (isWholeWords)
 				{
 					var oPrevElement = this.GetPrevRunElement(nPos);
 					if (!oPrevElement || (!oPrevElement.IsLetter() && !oPrevElement.IsDigit()))
@@ -14175,7 +14174,7 @@ ParaRun.prototype.Search = function(ParaSearch)
 				if (ParaSearch.StartPos)
 				{
 					var isAdd = false;
-					if (Props.Word)
+					if (isWholeWords)
 					{
 						var oNextElement = this.GetNextRunElement(nPos + 1);
 						if (!oNextElement || (!oNextElement.IsLetter() && !oNextElement.IsDigit()))

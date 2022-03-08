@@ -2425,12 +2425,12 @@ background-repeat: no-repeat;\
 		this.sendEvent("asc_onSearchEnd");
 	};
 
-	asc_docs_api.prototype.asc_replaceText = function(text, replaceWith, isReplaceAll, isMatchCase)
+	asc_docs_api.prototype.asc_replaceText = function(oProps, replaceWith, isReplaceAll)
 	{
 		if (null == this.WordControl.m_oLogicDocument)
 			return;
 
-		this.WordControl.m_oLogicDocument.Search(text, {MatchCase : isMatchCase});
+		this.WordControl.m_oLogicDocument.Search(oProps);
 
 		if (true === isReplaceAll)
 			this.WordControl.m_oLogicDocument.ReplaceSearchElement(replaceWith, true, -1);
@@ -2465,9 +2465,9 @@ background-repeat: no-repeat;\
 		// пустой метод
 	};
 
-	asc_docs_api.prototype.asc_findText = function(text, isNext, isMatchCase, callback)
+	asc_docs_api.prototype.asc_findText = function(oProps, isNext, callback)
 	{
-		var SearchEngine = editor.WordControl.m_oLogicDocument.Search(text, {MatchCase : isMatchCase});
+		var SearchEngine = editor.WordControl.m_oLogicDocument.Search(oProps);
 
 		var Id = this.WordControl.m_oLogicDocument.GetSearchElementId(isNext);
 

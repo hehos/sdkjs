@@ -9366,11 +9366,11 @@ CDocumentContent.prototype.RestartSpellCheck = function()
 //----------------------------------------------------------------------------------------------------------------------
 // Search
 //----------------------------------------------------------------------------------------------------------------------
-CDocumentContent.prototype.Search = function(sStr, oProps, oSearchEngine, nType)
+CDocumentContent.prototype.Search = function(oSearchEngine, nType)
 {
 	for (var nPos = 0, nCount = this.Content.length; nPos < nCount; ++nPos)
 	{
-		this.Content[nPos].Search(sStr, oProps, oSearchEngine, nType);
+		this.Content[nPos].Search(oSearchEngine, nType);
 	}
 };
 CDocumentContent.prototype.GetSearchElementId = function(bNext, bCurrent)

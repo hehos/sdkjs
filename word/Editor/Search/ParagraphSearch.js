@@ -39,11 +39,9 @@
 	 * Класс для поиска внутри параграфа
 	 * @constructor
 	 */
-	function CParagraphSearch(Paragraph, Str, Props, SearchEngine, Type)
+	function CParagraphSearch(Paragraph, SearchEngine, Type)
 	{
 		this.Paragraph    = Paragraph;
-		this.Str          = Str;
-		this.Props        = Props;
 		this.SearchEngine = SearchEngine;
 		this.Type         = Type;
 
@@ -62,7 +60,7 @@
 	};
 	CParagraphSearch.prototype.Check = function(nIndex, oItem)
 	{
-		return this.SearchEngine.Pattern.Check(nIndex, oItem, this.Props);
+		return this.SearchEngine.Pattern.Check(nIndex, oItem, this.SearchEngine);
 	};
 	CParagraphSearch.prototype.GetPrefix = function(nIndex)
 	{

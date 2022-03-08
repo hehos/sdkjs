@@ -19174,14 +19174,14 @@ CTable.prototype.RestartSpellCheck = function()
 //----------------------------------------------------------------------------------------------------------------------
 // Search
 //----------------------------------------------------------------------------------------------------------------------
-CTable.prototype.Search = function(sStr, oProps, oSearchEngine, nType)
+CTable.prototype.Search = function(oSearchEngine, nType)
 {
 	for (var nCurRow = 0, nRowsCount = this.GetRowsCount(); nCurRow < nRowsCount; ++nCurRow)
 	{
 		var oRow = this.GetRow(nCurRow);
 		for (var nCurCell = 0, nCellsCount = oRow.GetCellsCount(); nCurCell < nCellsCount; ++nCurCell)
 		{
-			oRow.GetCell(nCurCell).GetContent().Search(sStr, oProps, oSearchEngine, nType);
+			oRow.GetCell(nCurCell).GetContent().Search(oSearchEngine, nType);
 		}
 	}
 };

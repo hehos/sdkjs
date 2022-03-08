@@ -113,9 +113,9 @@
 	{
 		return this.Elements.length;
 	};
-	CSearchPatternEngine.prototype.Check = function(nPos, oRunItem, oProps)
+	CSearchPatternEngine.prototype.Check = function(nPos, oRunItem, oEngine)
 	{
-		var oSearchElement = oRunItem.ToSearchElement(oProps);
+		var oSearchElement = oRunItem.ToSearchElement(oEngine);
 
 		if (!oSearchElement)
 			return false;

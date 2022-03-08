@@ -1014,7 +1014,7 @@ CMathText.prototype.ToSearchElement = function(oProps)
 	if (undefined === nCodePoint || null === nCodePoint)
 		return null;
 
-	if (oProps.MatchCase)
+	if (oProps.IsMatchCase())
 		return new new AscCommonWord.CSearchTextItemChar(String.fromCodePoint(nCodePoint).toLowerCase().codePointAt(0));
 
 	return new new AscCommonWord.CSearchTextItemChar(nCodePoint);
