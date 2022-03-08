@@ -1585,9 +1585,9 @@ CBlockLevelSdt.prototype.RestartSpellCheck = function()
 //----------------------------------------------------------------------------------------------------------------------
 // Search
 //----------------------------------------------------------------------------------------------------------------------
-CBlockLevelSdt.prototype.Search = function(sStr, oProps, oSearchEngine, nType)
+CBlockLevelSdt.prototype.Search = function(oSearchEngine, nType)
 {
-	this.Content.Search(sStr, oProps, oSearchEngine, nType);
+	this.Content.Search(oSearchEngine, nType);
 };
 CBlockLevelSdt.prototype.GetSearchElementId = function(bNext, bCurrent)
 {

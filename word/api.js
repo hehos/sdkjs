@@ -3159,18 +3159,18 @@ background-repeat: no-repeat;\
 			this.WordControl.OnUpdateOverlay();
 		}
 	};
-	asc_docs_api.prototype.asc_findText = function(text, isNext, isMatchCase, callback)
+	asc_docs_api.prototype.asc_findText = function(oProps, isNext, callback)
 	{
 		var result = 0;
 		var isAsync = false;
 		if (null != this.WordControl.m_oDrawingDocument.m_oDocumentRenderer)
 		{
-			isAsync = (true === this.WordControl.m_oDrawingDocument.m_oDocumentRenderer.findText(text, isMatchCase, isNext, callback)) ? true : false;
+			isAsync = (true === this.WordControl.m_oDrawingDocument.m_oDocumentRenderer.findText(oProps.GetText(), oProps.IsMatchCase(), isNext, callback)) ? true : false;
 			result = this.WordControl.m_oDrawingDocument.m_oDocumentRenderer.SearchResults.Count;
 		}
 		else
 		{
-			var SearchEngine = editor.WordControl.m_oLogicDocument.Search(text, {MatchCase: isMatchCase});
+			var SearchEngine = editor.WordControl.m_oLogicDocument.Search(oProps);
 
 			var Id = this.WordControl.m_oLogicDocument.GetSearchElementId(isNext);
 
@@ -3182,9 +3182,10 @@ background-repeat: no-repeat;\
 
 		if (!isAsync && callback)
 			callback(result);
+
 		return result;
 	};
-	asc_docs_api.prototype.asc_replaceText = function(text, replaceWith, isReplaceAll, isMatchCase)
+	asc_docs_api.prototype.asc_replaceText = function(oProps, replaceWith, isReplaceAll)
 	{
 		if (this.asc_GetErrorForReplaceString(replaceWith))
 			return false;
@@ -3192,7 +3193,7 @@ background-repeat: no-repeat;\
 		if (null == this.WordControl.m_oLogicDocument)
 			return false;
 
-		this.WordControl.m_oLogicDocument.Search(text, {MatchCase : isMatchCase});
+		this.WordControl.m_oLogicDocument.Search(oProps);
 
 		if (true === isReplaceAll)
 			this.WordControl.m_oLogicDocument.ReplaceSearchElement(replaceWith, true, -1);
@@ -3254,6 +3255,14 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype.sync_setSearchCurrent = function(nCurrent, nOverallCount)
 	{
 		this.sendEvent("asc_onSetSearchCurrent", nCurrent, nOverallCount);
+	};
+	asc_docs_api.prototype.asc_StartTextAroundSearch = function()
+	{
+		let oLogicDocument = this.private_GetLogicDocument();
+		if (!oLogicDocument || !oLogicDocument.SearchEngine)
+			return;
+
+		oLogicDocument.SearchEngine.StartTextAround();
 	};
 	asc_docs_api.prototype.sync_startTextAroundSearch = function()
 	{
@@ -12521,6 +12530,7 @@ background-repeat: no-repeat;\
 	asc_docs_api.prototype['asc_replaceText']                           = asc_docs_api.prototype.asc_replaceText;
 	asc_docs_api.prototype['asc_GetErrorForReplaceString']              = asc_docs_api.prototype.asc_GetErrorForReplaceString;
 	asc_docs_api.prototype['asc_isSelectSearchingResults']              = asc_docs_api.prototype.asc_isSelectSearchingResults;
+	asc_docs_api.prototype['asc_StartTextAroundSearch']                 = asc_docs_api.prototype.asc_StartTextAroundSearch;
 	asc_docs_api.prototype['sync_ReplaceAllCallback']                   = asc_docs_api.prototype.sync_ReplaceAllCallback;
 	asc_docs_api.prototype['sync_SearchEndCallback']                    = asc_docs_api.prototype.sync_SearchEndCallback;
 	asc_docs_api.prototype['put_TextPrFontName']                        = asc_docs_api.prototype.put_TextPrFontName;

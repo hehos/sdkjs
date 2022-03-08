@@ -15627,9 +15627,13 @@ CDocument.prototype.private_MoveCursorPageUp = function(StartX, StartY, AddToSel
 };
 CDocument.prototype.private_ProcessTemplateReplacement = function(TemplateReplacementData)
 {
+	let oProps = new AscCommon.CSearchSettings();
+	oProps.SetMatchCase(true);
+
 	for (var Id in TemplateReplacementData)
 	{
-		this.Search(Id, {MatchCase : true}, false);
+		oProps.SetText(Id);
+		this.Search(oProps, false);
 		this.SearchEngine.ReplaceAll(TemplateReplacementData[Id], false);
 	}
 };
@@ -27088,35 +27092,35 @@ CDocument.prototype.TurnOnSpellCheck = function()
 //----------------------------------------------------------------------------------------------------------------------
 // Search
 //----------------------------------------------------------------------------------------------------------------------
-CDocument.prototype.Search = function(sStr, oProps, bDraw)
+CDocument.prototype.Search = function(oProps, bDraw)
 {
 	//let nStartTime = performance.now();
 
-	if (this.SearchEngine.Compare(sStr, oProps))
+	if (this.SearchEngine.Compare(oProps))
 		return this.SearchEngine;
 
 	this.SearchEngine.Clear();
-	this.SearchEngine.Set(sStr, oProps);
+	this.SearchEngine.Set(oProps);
 
 	for (var nIndex = 0, nCount = this.Content.length; nIndex < nCount; ++nIndex)
 	{
-		this.Content[nIndex].Search(sStr, oProps, this.SearchEngine, search_Common);
+		this.Content[nIndex].Search(this.SearchEngine, search_Common);
 	}
 
-	this.SectionsInfo.Search(sStr, oProps, this.SearchEngine);
+	this.SectionsInfo.Search(this.SearchEngine);
 
 	var arrFootnotes = this.GetFootnotesList(null, null);
 	this.SearchEngine.SetFootnotes(arrFootnotes);
 	for (var nIndex = 0, nCount = arrFootnotes.length; nIndex < nCount; ++nIndex)
 	{
-		arrFootnotes[nIndex].Search(sStr, oProps, this.SearchEngine, search_Footnote);
+		arrFootnotes[nIndex].Search(this.SearchEngine, search_Footnote);
 	}
 
 	var arrEndnotes = this.GetEndnotesList(null, null);
 	this.SearchEngine.SetEndnotes(arrEndnotes);
 	for (var nIndex = 0, nCount = arrEndnotes.length; nIndex < nCount; ++nIndex)
 	{
-		arrEndnotes[nIndex].Search(sStr, oProps, this.SearchEngine, search_Endnote);
+		arrEndnotes[nIndex].Search(this.SearchEngine, search_Endnote);
 	}
 
 	if (false !== bDraw)
@@ -28152,7 +28156,7 @@ CDocumentSectionsInfo.prototype.RestartSpellCheck = function()
 //----------------------------------------------------------------------------------------------------------------------
 // Search
 //----------------------------------------------------------------------------------------------------------------------
-CDocumentSectionsInfo.prototype.Search = function(sStr, oProps, oSearchEngine)
+CDocumentSectionsInfo.prototype.Search = function(oSearchEngine)
 {
 	var bEvenOdd = EvenAndOddHeaders;
 	for (var nIndex = 0, nCount = this.Elements.length; nIndex < nCount; ++nIndex)
@@ -28161,22 +28165,22 @@ CDocumentSectionsInfo.prototype.Search = function(sStr, oProps, oSearchEngine)
 		var bFirst  = oSectPr.Get_TitlePage();
 
 		if (oSectPr.HeaderFirst && true === bFirst)
-			oSectPr.HeaderFirst.Search(sStr, oProps, oSearchEngine, search_Header);
+			oSectPr.HeaderFirst.Search(oSearchEngine, search_Header);
 
 		if (oSectPr.HeaderEven && true === bEvenOdd)
-			oSectPr.HeaderEven.Search(sStr, oProps, oSearchEngine, search_Header);
+			oSectPr.HeaderEven.Search(oSearchEngine, search_Header);
 
 		if (oSectPr.HeaderDefault)
-			oSectPr.HeaderDefault.Search(sStr, oProps, oSearchEngine, search_Header);
+			oSectPr.HeaderDefault.Search(oSearchEngine, search_Header);
 
 		if (oSectPr.FooterFirst && true === bFirst)
-			oSectPr.FooterFirst.Search(sStr, oProps, oSearchEngine, search_Footer);
+			oSectPr.FooterFirst.Search(oSearchEngine, search_Footer);
 
 		if (oSectPr.FooterEven && true === bEvenOdd)
-			oSectPr.FooterEven.Search(sStr, oProps, oSearchEngine, search_Footer);
+			oSectPr.FooterEven.Search(oSearchEngine, search_Footer);
 
 		if (oSectPr.FooterDefault)
-			oSectPr.FooterDefault.Search(sStr, oProps, oSearchEngine, search_Footer);
+			oSectPr.FooterDefault.Search(oSearchEngine, search_Footer);
 	}
 };
 CDocumentSectionsInfo.prototype.GetSearchElementId = function(bNext, CurHdrFtr)

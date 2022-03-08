@@ -43,7 +43,7 @@
 		this.LogicDocument = oLogicDocument;
 		this.Text          = "";
 		this.MatchCase     = false;
-		this.Word	   	   = false;
+		this.Word          = false;
 		this.Pattern       = new AscCommonWord.CSearchPatternEngine();
 
 		this.Prefix        = [];
@@ -69,11 +69,14 @@
 		this.MatchCase = false;
 		this.Word	   = false;
 	};
-	CDocumentSearch.prototype.Compare = function(Text, Props)
+	/**
+	 * @param {AscCommon.CSearchSettings} oProps
+	 */
+	CDocumentSearch.prototype.Compare = function(oProps)
 	{
-		return (this.Text === Text
-			&& this.MatchCase === Props.MatchCase
-			&& this.Word === Props.Word);
+		return (oProps && this.Text === oProps.GetText()
+			&& this.MatchCase === oProps.IsMatchCase()
+			&& this.Word === oProps.IsWholeWords());
 	};
 	CDocumentSearch.prototype.Clear = function()
 	{
@@ -252,18 +255,32 @@
 
 		this.Clear();
 	};
-	CDocumentSearch.prototype.Set = function(sText, oProps)
+	/**
+	 * @param {AscCommon.CSearchSettings} oProps
+	 */
+	CDocumentSearch.prototype.Set = function(oProps)
 	{
-		this.Text      = sText;
-		this.MatchCase = oProps ? oProps.MatchCase : false;
-		this.Word      = oProps ? oProps.Word : false;
+		if (!oProps)
+			return;
 
-		var _sText = sText;
+		this.Text      = oProps.GetText();
+		this.MatchCase = oProps.IsMatchCase();
+		this.Word      = oProps.IsWholeWords();
+
+		var _sText = this.Text;
 		if (!this.MatchCase)
-			_sText = sText.toLowerCase();
+			_sText = this.Text.toLowerCase();
 
 		this.Pattern.Set(_sText);
 		this.private_CalculatePrefix();
+	};
+	CDocumentSearch.prototype.IsWholeWords = function()
+	{
+		return this.Word;
+	};
+	CDocumentSearch.prototype.IsMatchCase = function()
+	{
+		return this.MatchCase;
 	};
 	CDocumentSearch.prototype.SetFootnotes = function(arrFootnotes)
 	{
