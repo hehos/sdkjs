@@ -352,10 +352,13 @@
 		let nStartTime = performance.now();
 		while (performance.now() - nStartTime < 20)
 		{
-			if (this.TextAroundId >= this.Count)
+			if (this.TextAroundId >= this.Id)
 				break;
 
 			let sId = this.TextAroundId++;
+
+			if (!this.Elements[sId])
+				continue;
 
 			let sText = this.Elements[sId].GetTextAroundSearchResult(sId);
 			this.TextArround[sId] = sText;
@@ -365,7 +368,7 @@
 		this.LogicDocument.GetApi().sync_getTextAroundSearchPack(arrResult);
 
 		let oThis = this;
-		if (this.TextAroundId >= 0 && this.TextAroundId < this.Count)
+		if (this.TextAroundId >= 0 && this.TextAroundId < this.Id)
 		{
 			this.TextAroundTimer = setTimeout(function()
 			{

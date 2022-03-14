@@ -1015,9 +1015,9 @@ CMathText.prototype.ToSearchElement = function(oProps)
 		return null;
 
 	if (oProps.IsMatchCase())
-		return new new AscCommonWord.CSearchTextItemChar(String.fromCodePoint(nCodePoint).toLowerCase().codePointAt(0));
+		return new AscCommonWord.CSearchTextItemChar(String.fromCodePoint(nCodePoint).toLowerCase().codePointAt(0));
 
-	return new new AscCommonWord.CSearchTextItemChar(nCodePoint);
+	return new AscCommonWord.CSearchTextItemChar(nCodePoint);
 };
 /*CMathText.prototype.Recalculate_Reset = function(StartRange, StartLine, PRS)
 {
