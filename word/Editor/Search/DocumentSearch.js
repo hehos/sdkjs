@@ -59,8 +59,10 @@
 		this.Endnotes      = [];
 		this.InsertPattern = new AscCommonWord.CSearchPatternEngine();
 
-		this.TextAroundId    = -1;
-		this.TextAroundTimer = null;
+		this.TextAroundId     = -1;
+		this.TextAroundTimer  = null;
+		this.TextAroundUpdate = true;
+		this.ReplaceEvent     = true;
 	}
 
 	CDocumentSearch.prototype.Reset = function()
@@ -94,7 +96,9 @@
 		this.CurId     = -1;
 		this.Direction = true;
 
+		this.TextAroundUpdate = true;
 		this.StopTextAround();
+		this.SendClearAllTextAround();
 	};
 	CDocumentSearch.prototype.Add = function(Paragraph)
 	{
@@ -229,8 +233,15 @@
 					oPara.Selection.Use = bSelection;
 					oPara.Clear_NearestPosArray();
 				}
+
+				if (this.ReplaceEvent && !this.TextAroundUpdate)
+					this.LogicDocument.GetApi().sync_removeTextAroundSearch(Id);
+
+				return true;
 			}
 		}
+
+		return false;
 	};
 	CDocumentSearch.prototype.private_AddReplacedStringToRun = function(oRun, nInRunPos)
 	{
@@ -247,11 +258,15 @@
 	};
 	CDocumentSearch.prototype.ReplaceAll = function(NewStr, bUpdateStates)
 	{
+		this.RemoveEvent = false;
+
 		for (var Id = this.Id; Id >= 0; --Id)
 		{
 			if (this.Elements[Id])
 				this.Replace(NewStr, Id, true);
 		}
+
+		this.RemoveEvent = true;
 
 		this.Clear();
 	};
@@ -331,6 +346,10 @@
 	};
 	CDocumentSearch.prototype.StartTextAround = function()
 	{
+		if (!this.TextAroundUpdate)
+			return this.SendAllTextAround();
+
+		this.TextAroundUpdate = false;
 		this.StopTextAround();
 
 		this.TextAroundId = 0;
@@ -392,6 +411,31 @@
 
 		this.TextAroundTimer = null;
 		this.TextAroundId    = -1;
+	};
+	CDocumentSearch.prototype.SendAllTextAround = function()
+	{
+		if (this.TextAroundTimer)
+			return;
+
+		let arrResult = [];
+		for (let nId = 0; nId < this.Id; ++nId)
+		{
+			if (!this.Elements[nId] || undefined === this.TextArround[nId])
+				continue;
+
+			arrResult.push([nId, this.TextArround[nId]]);
+		}
+
+		let oApi = this.LogicDocument.GetApi();
+		oApi.sync_startTextAroundSearch();
+		oApi.sync_getTextAroundSearchPack(arrResult);
+		oApi.sync_endTextAroundSearch();
+	};
+	CDocumentSearch.prototype.SendClearAllTextAround = function()
+	{
+		let oApi = this.LogicDocument.GetApi();
+		oApi.sync_startTextAroundSearch();
+		oApi.sync_endTextAroundSearch();
 	};
 
 	//--------------------------------------------------------export----------------------------------------------------
