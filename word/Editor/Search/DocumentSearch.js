@@ -51,6 +51,7 @@
 		this.Id            = 0;
 		this.Count         = 0;
 		this.Elements      = {};
+		this.ReplacedId    = [];
 		this.CurId         = -1;
 		this.Direction     = true; // направление true - вперед, false - назад
 		this.ClearOnRecalc = true; // Флаг, говорящий о том, запустился ли пересчет из-за Replace
@@ -90,11 +91,12 @@
 			this.Elements[Id].ClearSearchResults();
 		}
 
-		this.Id        = 0;
-		this.Count     = 0;
-		this.Elements  = {};
-		this.CurId     = -1;
-		this.Direction = true;
+		this.Id         = 0;
+		this.Count      = 0;
+		this.Elements   = {};
+		this.ReplacedId = [];
+		this.CurId      = -1;
+		this.Direction  = true;
 
 		this.TextAroundUpdate = true;
 		this.StopTextAround();
@@ -129,8 +131,10 @@
 	CDocumentSearch.prototype.SetCurrent = function(nId)
 	{
 		this.CurId = undefined !== nId ? nId : -1;
+		let nIndex = -1 !== this.CurId ? this.GetElementIndexById(this.CurId) : -1;
+
 		let oApi = this.LogicDocument.GetApi()
-		oApi.sync_setSearchCurrent(this.CurId, this.Count);
+		oApi.sync_setSearchCurrent(nIndex, this.Count);
 	};
 	CDocumentSearch.prototype.ResetCurrent = function()
 	{
@@ -225,6 +229,7 @@
 
 				oPara.RemoveSearchResult(Id);
 				delete this.Elements[Id];
+				this.private_AddReplacedId(Id);
 
 				if (true === bRestorePos)
 				{
@@ -243,6 +248,16 @@
 
 		return false;
 	};
+	CDocumentSearch.prototype.private_AddReplacedId = function(nId)
+	{
+		for (let nPos = 0, nCount = this.ReplacedId.length; nPos < nCount; ++nPos)
+		{
+			if (this.ReplacedId[nPos] > nId)
+				return this.ReplacedId.splice(nPos, 0, nId);
+		}
+
+		this.ReplacedId.push(nId);
+	};
 	CDocumentSearch.prototype.private_AddReplacedStringToRun = function(oRun, nInRunPos)
 	{
 		var isMathRun = oRun.IsMathRun();
@@ -255,6 +270,18 @@
 				nAdd++;
 			}
 		}
+	};
+	CDocumentSearch.prototype.GetElementIndexById = function(nId)
+	{
+		for (let nPos = 0, nCount = this.ReplacedId.length; nPos < nCount; ++nPos)
+		{
+			if (this.ReplacedId[nPos] > nId)
+				return (nId - nPos);
+			else if (this.ReplacedId[nPos] === nId)
+				return -1;
+		}
+
+		return (nId - this.ReplacedId.length);
 	};
 	CDocumentSearch.prototype.ReplaceAll = function(NewStr, bUpdateStates)
 	{

@@ -143,7 +143,7 @@
 
 		return null;
 	};
-	
+
 	//--------------------------------------------------------export----------------------------------------------------
 	window['AscCommonWord'] = window['AscCommonWord'] || {};
 	window['AscCommonWord'].CSearchPatternEngine = CSearchPatternEngine;
