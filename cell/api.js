@@ -3018,6 +3018,15 @@ var editor;
         result = [ws.getCellLeftRelative(activeCell.col, 0), ws.getCellTopRelative(activeCell.row, 0)];
       }
     } else {
+
+		var SearchEngine = this.wb.Search(options);
+		var Id = this.wb.GetSearchElementId(/*isNext*/);
+
+		if (null != Id)
+			this.wb.SelectSearchElement(Id);
+
+		result = SearchEngine.Count;
+
       var d = this.wb.findCellText(options);
       this.controller.scroll(d);
       result = !!d;
@@ -3046,6 +3055,10 @@ var editor;
   spreadsheet_api.prototype.asc_endFindText = function() {
     // Нужно очистить поиск
     this.wb._cleanFindResults();
+  };
+
+  spreadsheet_api.prototype.sync_setSearchCurrent = function (nCurrent, nOverallCount) {
+    this.sendEvent("asc_onSetSearchCurrent", nCurrent, nOverallCount);
   };
 
   /**

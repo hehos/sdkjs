@@ -8645,6 +8645,8 @@
 	Worksheet.prototype.findCellText = function (options) {
 		this._findAllCells(options);
 
+		//CDocumentSearchExcel.prototype.SetCurrent
+
 		var selectionRange = options.selectionRange || this.selectionRange;
 		var activeCell = selectionRange.activeCell;
 

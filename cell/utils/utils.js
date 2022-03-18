@@ -3010,6 +3010,15 @@
 			this.countFindAll += this.countFind;
 			this.countReplaceAll += this.countReplace;
 		};
+		asc_CFindOptions.prototype.GetText = function () {
+			return this.findWhat;
+		};
+		asc_CFindOptions.prototype.IsMatchCase = function () {
+			return this.isMatchCase;
+		};
+		asc_CFindOptions.prototype.IsWholeWords = function () {
+			return this.isWholeWord;
+		};
 
 		asc_CFindOptions.prototype.asc_setFindWhat = function (val) {this.findWhat = val;};
 		asc_CFindOptions.prototype.asc_setScanByRows = function (val) {this.scanByRows = val;};

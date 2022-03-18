@@ -288,7 +288,12 @@
 
 	this.printPreviewState = new AscCommonExcel.CPrintPreviewState(this);
 
-    return this;
+	this.SearchEngine = null;
+	if (typeof CDocumentSearchExcel !== "undefined") {
+		this.SearchEngine = new CDocumentSearchExcel(this);
+	}
+
+	return this;
   }
 
   WorkbookView.prototype._init = function(fontRenderingMode) {
@@ -4307,6 +4312,240 @@
 		oWriter.WriteString2(rangeStr);
 		var BinaryLen = oWriter.GetCurPosition() - BinaryPos;
 		return (BinaryLen + ";" + oWriter.GetBase64Memory2(BinaryPos, BinaryLen));
+	};
+
+	//----------------------------------------------------------------------------------------------------------------------
+	// Search
+	//----------------------------------------------------------------------------------------------------------------------
+	WorkbookView.prototype.Search = function (oProps) {
+		if (this.SearchEngine.Compare(oProps)) {
+			return this.SearchEngine;
+		}
+
+		this.SearchEngine.Clear();
+		this.SearchEngine.Set(oProps);
+
+		//далее дёргаем в CDocumentSearchExcel -> Add
+		var result = this.model.findCellText(oProps);
+
+		return this.SearchEngine;
+	};
+
+	WorkbookView.prototype.GetSearchElementId = function(bNext)
+	{
+		var Id = null;
+
+		this.SearchEngine.SetDirection(bNext);
+
+
+		return Id;
+	};
+
+
+	/*this.closeCellEditor();
+	// Для поиска эта переменная не нужна (но она может остаться от replace)
+	options.selectionRange = null;
+
+	var result = this.model.findCellText(options);
+	if (result) {
+		var ws = this.getWorksheet();
+		var range = new Asc.Range(result.col, result.row, result.col, result.row);
+		options.findInSelection ? ws.setActiveCell(result) : ws.setSelection(range);
+		return true;
+	}
+	return null;*/
+
+	WorkbookView.prototype.SelectSearchElement = function(Id)
+	{
+		this.SearchEngine.Select(Id, true);
+	};
+
+
+	//временно добавляю сюда. в идеале - использовать общий класс из документов(или сделать базовый, от него наследоваться) - CDocumentSearch
+	function CDocumentSearchExcel(wb)
+	{
+		this.wb = wb;
+		this.Text          = "";
+		this.MatchCase     = false;
+		this.Word          = false;
+		//this.Pattern       = new AscCommonWord.CSearchPatternEngine();
+
+		this.Prefix        = [];
+
+		this.Id            = 0;
+		this.Count         = 0;
+		this.Elements      = {};
+		this.CurId         = -1;
+		this.Direction     = true; // направление true - вперед, false - назад
+		this.ClearOnRecalc = true; // Флаг, говорящий о том, запустился ли пересчет из-за Replace
+		this.Selection     = false;
+
+		//this.Footnotes     = [];
+		//this.Endnotes      = [];
+		//this.InsertPattern = new AscCommonWord.CSearchPatternEngine();
+
+		//this.TextAroundId     = -1;
+		//this.TextAroundTimer  = null;
+		//this.TextAroundUpdate = true;
+		//this.ReplaceEvent     = true;
+	}
+
+	CDocumentSearchExcel.prototype.Reset = function()
+	{
+		this.Text      = "";
+		this.MatchCase = false;
+		this.Word	   = false;
+	};
+	/**
+	 * @param {AscCommon.CSearchSettings} oProps
+	 */
+	CDocumentSearchExcel.prototype.Compare = function(oProps)
+	{
+		return (oProps && this.Text === oProps.GetText()
+			&& this.MatchCase === oProps.IsMatchCase()
+			&& this.Word === oProps.IsWholeWords());
+	};
+	CDocumentSearchExcel.prototype.Clear = function()
+	{
+		this.Reset();
+
+		// Очищаем предыдущие элементы поиска
+		for (var Id in this.Elements)
+		{
+			//this.Elements[Id].ClearSearchResults();
+		}
+
+		this.Id        = 0;
+		this.Count     = 0;
+		this.Elements  = {};
+		this.CurId     = -1;
+		this.Direction = true;
+
+		this.TextAroundUpdate = true;
+		//this.StopTextAround();
+		//this.SendClearAllTextAround();
+	};
+	CDocumentSearchExcel.prototype.Add = function(Paragraph)
+	{
+		this.Count++;
+		this.Elements[this.Id++] = Paragraph;
+		return (this.Id - 1);
+	};
+	CDocumentSearchExcel.prototype.Select = function(nId, bUpdateStates)
+	{
+		var elem = this.Elements[nId];
+		if (elem)
+		{
+			var ws = this.wb.getWorksheet();
+			var range = new Asc.Range(elem.col, elem.row, elem.col, elem.row);
+			//options.findInSelection ? ws.setActiveCell(result) : ws.setSelection(range);
+			ws.setSelection(range)
+
+			this.SetCurrent(nId);
+		}
+	};
+	CDocumentSearchExcel.prototype.SetCurrent = function(nId)
+	{
+		this.CurId = undefined !== nId ? nId : -1;
+		let oApi = this.LogicDocument.GetApi()
+		oApi.sync_setSearchCurrent(this.CurId, this.Count);
+	};
+	CDocumentSearchExcel.prototype.ResetCurrent = function()
+	{
+		this.SetCurrent(-1);
+	};
+	CDocumentSearchExcel.prototype.GetCount = function()
+	{
+		return this.Count;
+	};
+	CDocumentSearchExcel.prototype.GetCurrent = function()
+	{
+		return this.CurId;
+	};
+	CDocumentSearchExcel.prototype.Replace = function(sReplaceString, Id, bRestorePos)
+	{
+	};
+
+	CDocumentSearchExcel.prototype.ReplaceAll = function(NewStr, bUpdateStates)
+	{
+	};
+	/**
+	 * @param {AscCommon.CSearchSettings} oProps
+	 */
+	CDocumentSearchExcel.prototype.Set = function(oProps)
+	{
+		if (!oProps)
+			return;
+
+		this.Text      = oProps.GetText();
+		this.MatchCase = oProps.IsMatchCase();
+		this.Word      = oProps.IsWholeWords();
+
+		/*var _sText = this.Text;
+		if (!this.MatchCase)
+			_sText = this.Text.toLowerCase();
+
+		this.Pattern.Set(_sText);
+		this.private_CalculatePrefix();*/
+	};
+	CDocumentSearchExcel.prototype.IsWholeWords = function()
+	{
+		return this.Word;
+	};
+	CDocumentSearchExcel.prototype.IsMatchCase = function()
+	{
+		return this.MatchCase;
+	};
+	CDocumentSearchExcel.prototype.SetFootnotes = function(arrFootnotes)
+	{
+		this.Footnotes = arrFootnotes;
+	};
+	CDocumentSearchExcel.prototype.SetEndnotes = function(arrEndnotes)
+	{
+		this.Endnotes = arrEndnotes;
+	};
+	CDocumentSearchExcel.prototype.GetFootnotes = function()
+	{
+		return this.Footnotes;
+	};
+	CDocumentSearchExcel.prototype.GetEndnotes = function()
+	{
+		return this.Endnotes;
+	};
+	CDocumentSearchExcel.prototype.GetDirection = function()
+	{
+		return this.Direction;
+	};
+	CDocumentSearchExcel.prototype.SetDirection = function(bDirection)
+	{
+		this.Direction = bDirection;
+	};
+	CDocumentSearchExcel.prototype.private_CalculatePrefix = function()
+	{
+
+	};
+	CDocumentSearchExcel.prototype.GetPrefix = function(nIndex)
+	{
+		return this.Prefix[nIndex];
+	};
+	CDocumentSearchExcel.prototype.StartTextAround = function()
+	{
+
+	};
+	CDocumentSearchExcel.prototype.ContinueGetTextAround = function()
+	{
+
+	};
+	CDocumentSearchExcel.prototype.StopTextAround = function()
+	{
+
+	};
+	CDocumentSearchExcel.prototype.SendAllTextAround = function()
+	{
+
+	};
+	CDocumentSearchExcel.prototype.SendClearAllTextAround = function()
+	{
 	};
 
 	//------------------------------------------------------------export---------------------------------------------------
