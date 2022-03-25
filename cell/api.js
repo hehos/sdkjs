@@ -3027,9 +3027,9 @@ var editor;
 
 		result = SearchEngine.Count;
 
-      var d = this.wb.findCellText(options);
+     /* var d = this.wb.findCellText(options);
       this.controller.scroll(d);
-      result = !!d;
+      result = !!d;*/
     }
 
     if (callback)
@@ -3060,6 +3060,28 @@ var editor;
   spreadsheet_api.prototype.sync_setSearchCurrent = function (nCurrent, nOverallCount) {
     this.sendEvent("asc_onSetSearchCurrent", nCurrent, nOverallCount);
   };
+
+	spreadsheet_api.prototype.sync_startTextAroundSearch = function () {
+		this.sendEvent("asc_onStartTextAroundSearch");
+	};
+	spreadsheet_api.prototype.sync_endTextAroundSearch = function () {
+		this.sendEvent("asc_onEndTextAroundSearch");
+	};
+	spreadsheet_api.prototype.sync_getTextAroundSearchPack = function (arrElements) {
+		this.sendEvent("asc_onGetTextAroundSearchPack", arrElements);
+	};
+	spreadsheet_api.prototype.sync_removeTextAroundSearch = function (sId) {
+		this.sendEvent("asc_onRemoveTextAroundSearch", [sId]);
+	};
+
+	spreadsheet_api.prototype.asc_StartTextAroundSearch = function()
+	{
+		/*let oLogicDocument = this.private_GetLogicDocument();
+		if (!oLogicDocument || !oLogicDocument.SearchEngine)
+			return;
+
+		oLogicDocument.SearchEngine.StartTextAround();*/
+	};
 
   /**
    * Делает активной указанную ячейку

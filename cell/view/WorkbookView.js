@@ -4326,19 +4326,15 @@
 		this.SearchEngine.Set(oProps);
 
 		//далее дёргаем в CDocumentSearchExcel -> Add
-		var result = this.model.findCellText(oProps);
+		var result = this.model.findCellText2(oProps, this.SearchEngine);
 
 		return this.SearchEngine;
 	};
 
 	WorkbookView.prototype.GetSearchElementId = function(bNext)
 	{
-		var Id = null;
-
 		this.SearchEngine.SetDirection(bNext);
-
-
-		return Id;
+		return this.SearchEngine.GetNextElement();
 	};
 
 
@@ -4422,13 +4418,13 @@
 		this.Direction = true;
 
 		this.TextAroundUpdate = true;
-		//this.StopTextAround();
-		//this.SendClearAllTextAround();
+		this.StopTextAround();
+		this.SendClearAllTextAround();
 	};
-	CDocumentSearchExcel.prototype.Add = function(Paragraph)
+	CDocumentSearchExcel.prototype.Add = function(cell)
 	{
 		this.Count++;
-		this.Elements[this.Id++] = Paragraph;
+		this.Elements[this.Id++] = {text: cell.getValueForEdit(), col: cell.nCol, row: cell.nRow};
 		return (this.Id - 1);
 	};
 	CDocumentSearchExcel.prototype.Select = function(nId, bUpdateStates)
@@ -4447,7 +4443,7 @@
 	CDocumentSearchExcel.prototype.SetCurrent = function(nId)
 	{
 		this.CurId = undefined !== nId ? nId : -1;
-		let oApi = this.LogicDocument.GetApi()
+		let oApi = window["Asc"]["editor"];
 		oApi.sync_setSearchCurrent(this.CurId, this.Count);
 	};
 	CDocumentSearchExcel.prototype.ResetCurrent = function()
@@ -4461,6 +4457,12 @@
 	CDocumentSearchExcel.prototype.GetCurrent = function()
 	{
 		return this.CurId;
+	};
+	CDocumentSearchExcel.prototype.GetNextElement = function()
+	{
+		var id = this.Direction ? this.CurId + 1 : this.CurId - 1;
+		var needElem = this.Elements[id];
+		return needElem ? id : null;
 	};
 	CDocumentSearchExcel.prototype.Replace = function(sReplaceString, Id, bRestorePos)
 	{
@@ -4518,7 +4520,9 @@
 	};
 	CDocumentSearchExcel.prototype.SetDirection = function(bDirection)
 	{
-		this.Direction = bDirection;
+		if (bDirection != null) {
+			this.Direction = bDirection;
+		}
 	};
 	CDocumentSearchExcel.prototype.private_CalculatePrefix = function()
 	{
@@ -4528,24 +4532,100 @@
 	{
 		return this.Prefix[nIndex];
 	};
+
+
 	CDocumentSearchExcel.prototype.StartTextAround = function()
 	{
+		if (!this.TextAroundUpdate)
+			return this.SendAllTextAround();
 
+		this.TextAroundUpdate = false;
+		this.StopTextAround();
+
+		this.TextAroundId = 0;
+
+		this.LogicDocument.GetApi().sync_startTextAroundSearch();
+
+		let oThis = this;
+		this.TextAroundTimer = setTimeout(function()
+		{
+			oThis.ContinueGetTextAround()
+		}, 20);
+
+		this.TextArround = [];
 	};
 	CDocumentSearchExcel.prototype.ContinueGetTextAround = function()
 	{
+		let arrResult = [];
 
+		let nStartTime = performance.now();
+		while (performance.now() - nStartTime < 20)
+		{
+			if (this.TextAroundId >= this.Id)
+				break;
+
+			let sId = this.TextAroundId++;
+
+			if (!this.Elements[sId])
+				continue;
+
+			let sText = this.Elements[sId].GetTextAroundSearchResult(sId);
+			this.TextArround[sId] = sText;
+			arrResult.push([sId, sText]);
+		}
+
+		this.LogicDocument.GetApi().sync_getTextAroundSearchPack(arrResult);
+
+		let oThis = this;
+		if (this.TextAroundId >= 0 && this.TextAroundId < this.Id)
+		{
+			this.TextAroundTimer = setTimeout(function()
+			{
+				oThis.ContinueGetTextAround();
+			}, 20);
+		}
+		else
+		{
+			this.TextAroundId    = -1;
+			this.TextAroundTimer = null;
+			this.LogicDocument.GetApi().sync_endTextAroundSearch();
+		}
 	};
 	CDocumentSearchExcel.prototype.StopTextAround = function()
 	{
+		if (this.TextAroundTimer)
+		{
+			clearTimeout(this.TextAroundTimer);
+			this.LogicDocument.GetApi().sync_endTextAroundSearch();
+		}
 
+		this.TextAroundTimer = null;
+		this.TextAroundId    = -1;
 	};
 	CDocumentSearchExcel.prototype.SendAllTextAround = function()
 	{
+		if (this.TextAroundTimer)
+			return;
 
+		let arrResult = [];
+		for (let nId = 0; nId < this.Id; ++nId)
+		{
+			if (!this.Elements[nId] || undefined === this.TextArround[nId])
+				continue;
+
+			arrResult.push([nId, this.TextArround[nId]]);
+		}
+
+		let oApi = window["Asc"]["editor"];
+		oApi.sync_startTextAroundSearch();
+		oApi.sync_getTextAroundSearchPack(arrResult);
+		oApi.sync_endTextAroundSearch();
 	};
 	CDocumentSearchExcel.prototype.SendClearAllTextAround = function()
 	{
+		let oApi = window["Asc"]["editor"];
+		oApi.sync_startTextAroundSearch();
+		oApi.sync_endTextAroundSearch();
 	};
 
 	//------------------------------------------------------------export---------------------------------------------------

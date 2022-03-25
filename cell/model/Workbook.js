@@ -3267,6 +3267,68 @@
 		}
 		return result2 || result;
 	};
+	Workbook.prototype.findCellText2 = function (options, searchEngine) {
+		var ws = this.getActiveWs();
+		var result = ws._findAllCells(options, searchEngine), result2 = null;
+		return;
+
+
+
+		if (!options.scanOnOnlySheet) {
+			// Search on workbook
+			var key = result && (result.col + "-" + result.row);
+			if (!key || (options.isEqual(this.lastFindOptions) && this.lastFindCells[key])) {
+				// Мы уже находили данную ячейку, попробуем на другом листе
+				var i, active = this.getActive(), start = 0, end = this.getWorksheetCount();
+				var inc = options.scanForward ? +1 : -1;
+				for (i = active + inc; i < end && i >= start; i += inc) {
+					ws = this.getWorksheet(i);
+					if (ws.getHidden()) {
+						continue;
+					}
+					result2 = ws.findCellText(options);
+					if (result2) {
+						break;
+					}
+				}
+				if (!result2) {
+					// Мы дошли до конца или начала (в зависимости от направления, теперь пойдем до активного)
+					if (options.scanForward) {
+						i = 0;
+						end = active;
+					} else {
+						i = end - 1;
+						start = active + 1;
+					}
+					inc *= -1;
+					for (; i < end && i >= start; i += inc) {
+						ws = this.getWorksheet(i);
+						if (ws.getHidden()) {
+							continue;
+						}
+						result2 = ws.findCellText(options);
+						if (result2) {
+							break;
+						}
+					}
+				}
+
+				if (result2) {
+					this.handlers.trigger('undoRedoHideSheet', i);
+					key = result2.col + "-" + result2.row;
+				}
+			}
+
+			if (key) {
+				this.lastFindOptions = options.clone();
+				this.lastFindCells[key] = true;
+			}
+		}
+		if (!result2 && !result) {
+			this.cleanFindResults();
+		}
+		return result2 || result;
+	};
 	//Comments
 	Workbook.prototype.getComment = function (id) {
 		if (id) {
@@ -8549,7 +8611,7 @@
 	Worksheet.prototype.clearFindResults = function () {
 		this.lastFindOptions = null;
 	};
-	Worksheet.prototype._findAllCells = function (options) {
+	Worksheet.prototype._findAllCells = function (options, searchEngine) {
 		if (true !== options.isMatchCase) {
 			options.findWhat = options.findWhat.toLowerCase();
 		}
@@ -8623,7 +8685,7 @@
 					r = c;
 					c = tmp;
 				}
-				result.add(r, c, cell);
+				searchEngine ? searchEngine.Add(cell) : result.add(r, c, cell);
 			}
 		}]);
 		if (isWholeWordTrue !== null) {
