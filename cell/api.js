@@ -3076,11 +3076,11 @@ var editor;
 
 	spreadsheet_api.prototype.asc_StartTextAroundSearch = function()
 	{
-		/*let oLogicDocument = this.private_GetLogicDocument();
-		if (!oLogicDocument || !oLogicDocument.SearchEngine)
+		let wb = this.wb;
+		if (!wb || !wb.SearchEngine)
 			return;
 
-		oLogicDocument.SearchEngine.StartTextAround();*/
+		wb.SearchEngine.StartTextAround();
 	};
 
   /**

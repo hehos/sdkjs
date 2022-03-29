@@ -4424,7 +4424,8 @@
 	CDocumentSearchExcel.prototype.Add = function(cell)
 	{
 		this.Count++;
-		this.Elements[this.Id++] = {text: cell.getValueForEdit(), col: cell.nCol, row: cell.nRow};
+		//[sheet, name, cell, value,formula]
+		this.Elements[this.Id++] = {sheet: cell.ws.sName, name: null, cell: cell.getName(), text: cell.getValueForEdit(), formula: cell.getFormula(), col: cell.nCol, row: cell.nRow};
 		return (this.Id - 1);
 	};
 	CDocumentSearchExcel.prototype.Select = function(nId, bUpdateStates)
@@ -4544,7 +4545,8 @@
 
 		this.TextAroundId = 0;
 
-		this.LogicDocument.GetApi().sync_startTextAroundSearch();
+		let oApi = window["Asc"]["editor"];
+		oApi.sync_startTextAroundSearch();
 
 		let oThis = this;
 		this.TextAroundTimer = setTimeout(function()
@@ -4569,12 +4571,14 @@
 			if (!this.Elements[sId])
 				continue;
 
-			let sText = this.Elements[sId].GetTextAroundSearchResult(sId);
+			let sText = this.Elements[sId].text;
 			this.TextArround[sId] = sText;
-			arrResult.push([sId, sText]);
+			//[id, sheet, name, cell, value,formula]
+			arrResult.push([sId, this.Elements[sId].sheet, this.Elements[sId].name, this.Elements[sId].cell, sText, this.Elements[sId].formula]);
 		}
 
-		this.LogicDocument.GetApi().sync_getTextAroundSearchPack(arrResult);
+		let oApi = window["Asc"]["editor"];
+		oApi.sync_getTextAroundSearchPack(arrResult);
 
 		let oThis = this;
 		if (this.TextAroundId >= 0 && this.TextAroundId < this.Id)
@@ -4588,7 +4592,7 @@
 		{
 			this.TextAroundId    = -1;
 			this.TextAroundTimer = null;
-			this.LogicDocument.GetApi().sync_endTextAroundSearch();
+			oApi.sync_endTextAroundSearch();
 		}
 	};
 	CDocumentSearchExcel.prototype.StopTextAround = function()
