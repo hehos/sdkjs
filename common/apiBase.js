@@ -3556,6 +3556,18 @@
 	baseEditorsApi.prototype.sync_setSearchCurrent = function(nCurrent, nOverallCount)
 	{
 	};
+	baseEditorsApi.prototype.sync_startTextAroundSearch = function()
+	{
+	};
+	baseEditorsApi.prototype.sync_endTextAroundSearch = function()
+	{
+	};
+	baseEditorsApi.prototype.sync_getTextAroundSearchPack = function(arrElements)
+	{
+	};
+	baseEditorsApi.prototype.sync_removeTextAroundSearch = function(sId)
+	{
+	};
 	//---------------------------------------------------------version----------------------------------------------------
 	baseEditorsApi.prototype["GetVersion"] = baseEditorsApi.prototype.GetVersion = function()
 	{
