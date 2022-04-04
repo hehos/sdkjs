@@ -3212,7 +3212,7 @@
 	Workbook.prototype.findCellText = function (options) {
 		var ws = this.getActiveWs();
 		var result = ws.findCellText(options), result2 = null;
-		if (!options.scanOnOnlySheet) {
+		if (Asc.c_oAscSearchBy.Workbbook === options.scanOnOnlySheet) {
 			// Search on workbook
 			var key = result && (result.col + "-" + result.row);
 			if (!key || (options.isEqual(this.lastFindOptions) && this.lastFindCells[key])) {
@@ -3274,7 +3274,7 @@
 
 
 
-		if (!options.scanOnOnlySheet) {
+		if (Asc.c_oAscSearchBy.Workbook === options.scanOnOnlySheet) {
 			// Search on workbook
 			var key = result && (result.col + "-" + result.row);
 			if (!key || (options.isEqual(this.lastFindOptions) && this.lastFindCells[key])) {
@@ -8635,7 +8635,7 @@
 		var lastRange = selectionRange.getLast();
 		var activeCell = selectionRange.activeCell;
 		var merge = this.getMergedByCell(activeCell.row, activeCell.col);
-		options.findInSelection = options.scanOnOnlySheet &&
+		options.findInSelection = Asc.c_oAscSearchBy.Sheet === options.scanOnOnlySheet &&
 			!(selectionRange.isSingleRange() && (lastRange.isOneCell() || lastRange.isEqual(merge)));
 
 		var findRange;

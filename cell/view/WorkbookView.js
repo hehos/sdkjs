@@ -2933,7 +2933,7 @@
   WorkbookView.prototype._replaceCellTextCallback = function(options) {
     if (!options.error) {
 		options.updateFindAll();
-		if (!options.scanOnOnlySheet && options.isReplaceAll) {
+		if (Asc.c_oAscSearchBy.Workbook === options.scanOnOnlySheet && options.isReplaceAll) {
 			// Замена на всей книге
 			var i = ++options.sheetIndex;
 			if (this.model.getActive() === i) {

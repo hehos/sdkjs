@@ -15397,7 +15397,7 @@
 		var c = ar.col;
 		var r = ar.row;
 		var merge = this.model.getMergedByCell(r, c);
-		options.findInSelection = options.scanOnOnlySheet &&
+		options.findInSelection = Asc.c_oAscSearchBy.Sheet === options.scanOnOnlySheet &&
 			!(selectionRange.isSingleRange() && (lastRange.isOneCell() || lastRange.isEqual(merge)));
 
 		var minC, minR, maxC, maxR;
