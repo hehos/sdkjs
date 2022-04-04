@@ -3083,6 +3083,15 @@ var editor;
 		wb.SearchEngine.StartTextAround();
 	};
 
+	spreadsheet_api.prototype.asc_SelectSearchElement = function(sId)
+	{
+		let wb = this.wb;
+		if (!wb || !wb.SearchEngine)
+			return;
+
+		wb.SelectSearchElement(sId);
+	};
+
   /**
    * Делает активной указанную ячейку
    * @param {String} reference  Ссылка на ячейку вида A1 или R1C1
