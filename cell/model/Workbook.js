@@ -8638,6 +8638,13 @@
 		options.findInSelection = Asc.c_oAscSearchBy.Sheet === options.scanOnOnlySheet &&
 			!(selectionRange.isSingleRange() && (lastRange.isOneCell() || lastRange.isEqual(merge)));
 
+		if (options.specificRange) {
+			lastRange = AscCommonExcel.g_oRangeCache.getAscRange(options.specificRange);
+			if (lastRange) {
+				options.findInSelection = true;
+			}
+		}
+
 		var findRange;
 		var maxRowsCount = this.getRowsCount();
 		var maxColsCount = this.getColsCount();
