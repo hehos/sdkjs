@@ -2579,6 +2579,7 @@
             }
         };
 
+		var ws = this.getActiveWS();
         var addFunction = function (name) {
         	t.setWizardMode(true);
 			if (doCleanCellContent || !t.cellEditor.isFormula()) {
@@ -2586,23 +2587,64 @@
                 t.cellEditor.selectionEnd = t.cellEditor.textRender.getEndOfText();
             }
 
-			var parseResult;
-			if (!name && t.cellEditor._formula) {
-				t.cellEditor._formula.isParsed = false;
-				parseResult = new AscCommonExcel.ParseResult([]);
-				t.cellEditor._formula.parse(undefined, undefined, parseResult, true);
+			var res;
+			if (!name && t.cellEditor._formula && t.cellEditor._parseResult) {
+
+				//get arguments position + first function info(on open wizard)
+				/*t.cellEditor._formula.isParsed = false;
+				var parseResult = new AscCommonExcel.ParseResult([]);
+				t.cellEditor._formula.parse(undefined, undefined, parseResult, true);*/
+
+				var parseResult = t.cellEditor._parseResult;
 				name = parseResult.activeFunction.func.name;
+
+				if (name) {
+					res = new AscCommonExcel.CFunctionInfo(name)
+
+					res.argumentsValue = parseResult.getArgumentsValue(t.cellEditor._formula.Formula);
+					if (res.argumentsValue) {
+						var argumentsType = parseResult.activeFunction.func.argumentsType;
+						res.argumentsResult = [];
+						for (var i = 0; i < res.argumentsValue.length; i++) {
+							var argType = null;
+							if (argumentsType) {
+								if (typeof argumentsType[i] == 'object') {
+									argType = argumentsType[i][0];
+								} else if (i > argumentsType.length - 1) {
+									var lastArgType = argumentsType[argumentsType.length - 1];
+									if (typeof lastArgType == 'object') {
+										argType = lastArgType[(i - (argumentsType.length - 1)) % lastArgType.length]
+									}
+								} else {
+									argType = argumentsType[i];
+								}
+							}
+							var argCalc = ws.calculateWizardFormula(res.argumentsValue[i], argType);
+							res.argumentsResult[i] = argCalc.str;
+						}
+					}
+
+					//get result
+					var sArguments = res.argumentsValue.join(AscCommon.FormulaSeparators.functionArgumentSeparator);
+					if (argCalc.obj && argCalc.obj.type !== AscCommonExcel.cElementType.error) {
+						var funcCalc = ws.calculateWizardFormula(name + '(' + sArguments + ')');
+						res.functionResult = funcCalc.str;
+						if (funcCalc.obj && funcCalc.obj.type !== AscCommonExcel.cElementType.error) {
+							res.formulaResult = ws.calculateWizardFormula(t.cellEditor._formula).str;
+						}
+					}
+
+					t.cellEditor.lastRangePos = parseResult.argPosArr[0].start;
+					t.cellEditor.lastRangeLength = parseResult.argPosArr[parseResult.argPosArr.length - 1].end - parseResult.argPosArr[0].start;
+				}
 			} else {
 				t.cellEditor.insertFormula(name);
 			}
 
 			// ToDo send info from selection
-			var res = name ? new AscCommonExcel.CFunctionInfo(name) : null;
-			if (res && parseResult) {
-				res.argumentsValue = parseResult.getArgumentsValue(t.cellEditor._formula.Formula);
+			if (!res) {
+				res = name ? new AscCommonExcel.CFunctionInfo(name) : null;
 			}
-
-
 			t.handlers.trigger("asc_onSendFunctionWizardInfo", res);
         };
 
