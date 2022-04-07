@@ -2585,9 +2585,24 @@
                 t.cellEditor.selectionBegin = 0;
                 t.cellEditor.selectionEnd = t.cellEditor.textRender.getEndOfText();
             }
-			t.cellEditor.insertFormula(name);
+
+			var parseResult;
+			if (!name && t.cellEditor._formula) {
+				t.cellEditor._formula.isParsed = false;
+				parseResult = new AscCommonExcel.ParseResult([]);
+				t.cellEditor._formula.parse(undefined, undefined, parseResult, true);
+				name = parseResult.activeFunction.func.name;
+			} else {
+				t.cellEditor.insertFormula(name);
+			}
+
 			// ToDo send info from selection
 			var res = name ? new AscCommonExcel.CFunctionInfo(name) : null;
+			if (res && parseResult) {
+				res.argumentsValue = parseResult.getArgumentsValue(t.cellEditor._formula.Formula);
+			}
+
+
 			t.handlers.trigger("asc_onSendFunctionWizardInfo", res);
         };
 

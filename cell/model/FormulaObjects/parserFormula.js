@@ -5229,6 +5229,18 @@ _func[cElementType.cell3D] = _func[cElementType.cell];
 		return null;
 	};
 
+	ParseResult.prototype.getArgumentsValue = function(sFormula) {
+		var res = null;
+		if (sFormula && this.argPosArr) {
+			for (var i = 0; i < this.argPosArr.length; i++) {
+				if (!res) {
+					res = [];
+				}
+				res.push(sFormula.substring(this.argPosArr[i].start - 1, this.argPosArr[i].end - 1));
+			}
+		}
+		return res;
+	};
 
 	var g_defParseResult = new ParseResult(undefined, undefined);
 
