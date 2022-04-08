@@ -2589,14 +2589,8 @@
 
 			var res;
 			if (!name && t.cellEditor._formula && t.cellEditor._parseResult) {
-
-				//get arguments position + first function info(on open wizard)
-				/*t.cellEditor._formula.isParsed = false;
-				var parseResult = new AscCommonExcel.ParseResult([]);
-				t.cellEditor._formula.parse(undefined, undefined, parseResult, true);*/
-
 				var parseResult = t.cellEditor._parseResult;
-				name = parseResult.activeFunction.func.name;
+				name = parseResult.activeFunction && parseResult.activeFunction.func && parseResult.activeFunction.func.name;
 
 				if (name) {
 					res = new AscCommonExcel.CFunctionInfo(name)
