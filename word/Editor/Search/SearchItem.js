@@ -503,7 +503,7 @@
 	CSearchTextSpecialAnySpace.prototype = Object.create(CSearchTextItemBase.prototype);
 	CSearchTextSpecialAnySpace.prototype.IsMatch = function(oItem)
 	{
-		return ((oItem.IsChar() && AscCommon.IsSpace(oItem.GetValue()))
+		return ((oItem.IsChar() && (AscCommon.IsSpace(oItem.GetValue()) || 0xA0 === oItem.GetValue()))
 			|| oItem.IsAnySpace()
 			|| oItem.IsNonBreakingSpace()
 			|| oItem.IsAnySymbol());
@@ -524,7 +524,7 @@
 	CSearchTextSpecialEmDash.prototype = Object.create(CSearchTextItemBase.prototype);
 	CSearchTextSpecialEmDash.prototype.IsMatch = function(oItem)
 	{
-		return ((oItem.IsChar() && 0x2010 <= oItem.GetValue() && oItem.GetValue() <= 0x2015)
+		return ((oItem.IsChar() && 0x2014 === oItem.GetValue())
 			|| oItem.IsEmDash()
 			|| oItem.IsAnySymbol());
 	};
@@ -557,7 +557,7 @@
 	CSearchTextSpecialEnDash.prototype = Object.create(CSearchTextItemBase.prototype);
 	CSearchTextSpecialEnDash.prototype.IsMatch = function(oItem)
 	{
-		return ((oItem.IsChar() && 0x2D === oItem.GetValue())
+		return ((oItem.IsChar() && 0x2013 === oItem.GetValue())
 			|| oItem.IsEnDash()
 			|| oItem.IsAnySymbol());
 	};
