@@ -2580,7 +2580,7 @@
         };
 
 		var ws = this.getActiveWS();
-        var addFunction = function (name) {
+        var addFunction = function (name, cellEditMode) {
         	t.setWizardMode(true);
 			if (doCleanCellContent || !t.cellEditor.isFormula()) {
                 t.cellEditor.selectionBegin = 0;
@@ -2592,9 +2592,20 @@
 				var parseResult = t.cellEditor._parseResult;
 				name = parseResult.activeFunction && parseResult.activeFunction.func && parseResult.activeFunction.func.name;
 
+				if (cellEditMode) {
+					//ищем общую функцию, в которой находится курсор
+					//если начало и конец селекта в одной функции - показываем настройки для неё, если в разных - добавляем новую
+					var activeFunction = parseResult.getActiveFunction(t.cellEditor.selectionBegin, t.cellEditor.selectionEnd);
+					if (activeFunction) {
+						parseResult.activeFunction = activeFunction;
+						parseResult.argPosArr = activeFunction.args;
+					}
+				}
+
 				if (name) {
 					res = new AscCommonExcel.CFunctionInfo(name)
 
+					//получаем массив аргументов
 					res.argumentsValue = parseResult.getArgumentsValue(t.cellEditor._formula.Formula);
 					if (res.argumentsValue) {
 						var argumentsType = parseResult.activeFunction.func.argumentsType;
@@ -2613,6 +2624,7 @@
 									argType = argumentsType[i];
 								}
 							}
+							//вычисляем результат каждого аргумента
 							var argCalc = ws.calculateWizardFormula(res.argumentsValue[i], argType);
 							res.argumentsResult[i] = argCalc.str;
 						}
@@ -2650,7 +2662,7 @@
             return;
         }
 
-        addFunction(name);
+        addFunction(name, true);
     };
 
     WorkbookView.prototype.canEnterWizardRange = function (char) {

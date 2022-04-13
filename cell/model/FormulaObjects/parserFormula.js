@@ -5242,6 +5242,59 @@ _func[cElementType.cell3D] = _func[cElementType.cell];
 		return res;
 	};
 
+	ParseResult.prototype.getActiveFunction = function(start, end) {
+		var res = null;
+		if (this.allFunctionsPos) {
+			var startFuncs, endFuncs, i, j;
+			for (i = 0; i < this.allFunctionsPos.length; i++) {
+				if (this.allFunctionsPos[i].start <= start && this.allFunctionsPos[i].end >= start) {
+					if (!startFuncs) {
+						startFuncs = [];
+					}
+					startFuncs.push(this.allFunctionsPos[i]);
+				}
+				if (start !== end && this.allFunctionsPos[i].start <= end && this.allFunctionsPos[i].end >= end) {
+					if (!endFuncs) {
+						endFuncs = [];
+					}
+					endFuncs.push(this.allFunctionsPos[i]);
+				}
+			}
+
+			if (startFuncs) {
+				var commonFuncs;
+				if (start === end) {
+					commonFuncs = startFuncs;
+				} else if (endFuncs) {
+					//ищем самую внутреннюю функцию, где находится и начало и конец диапазона
+					for (i = 0; i < startFuncs.length; i++) {
+						for (j = 0; j < endFuncs.length; j++) {
+							if (startFuncs[i] === endFuncs[j]) {
+								if (!commonFuncs) {
+									commonFuncs = [];
+								}
+								commonFuncs.push(startFuncs[i]);
+								break;
+							}
+						}
+					}
+				}
+
+				//ищем самую внутреннюю функцию
+				if (commonFuncs) {
+					res = commonFuncs[0];
+					for (i = 1; i < commonFuncs.length; i++) {
+						if (commonFuncs[i].start >= res.start && commonFuncs[i].end <= res.end) {
+							res = commonFuncs[i];
+						}
+					}
+				}
+			}
+
+		}
+		return res;
+	};
+
 	var g_defParseResult = new ParseResult(undefined, undefined);
 
 	var lastListenerId = 0;
